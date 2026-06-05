@@ -9,6 +9,6 @@ Installers:
     InstallerUrl: https://github.com/ashishpatel26/RAMKeeper/releases/download/v1.0.0/RAMKeeper.exe
     # Replace the value below with the actual SHA256 hash after downloading the release:
     # Get-FileHash .\RAMKeeper.exe -Algorithm SHA256
-    InstallerSha256: F5C2DD91C0EC523267BCFBDEC9141069BCC97BE5CF13739EDAFA091A6FD5A586
+    InstallerSha256: 1DDA51E9A7A29BF7C1F4D41619B8CB3F7F173A96EC1FB236A4019839E33791A7
 ManifestType: installer
 ManifestVersion: 1.6.0

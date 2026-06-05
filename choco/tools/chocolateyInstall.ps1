@@ -9,9 +9,9 @@ $packageArgs = @{
   fileType       = 'exe'
   url            = 'https://github.com/ashishpatel26/RAMKeeper/releases/download/v1.0.0/RAMKeeper.exe'
 
-  # TODO: Replace F5C2DD91C0EC523267BCFBDEC9141069BCC97BE5CF13739EDAFA091A6FD5A586 with the actual SHA-256 hash of RAMKeeper.exe before submitting.
+  # TODO: Replace 1DDA51E9A7A29BF7C1F4D41619B8CB3F7F173A96EC1FB236A4019839E33791A7 with the actual SHA-256 hash of RAMKeeper.exe before submitting.
   # Run: (Get-FileHash -Algorithm SHA256 "RAMKeeper.exe").Hash
-  checksum       = 'F5C2DD91C0EC523267BCFBDEC9141069BCC97BE5CF13739EDAFA091A6FD5A586'
+  checksum       = '1DDA51E9A7A29BF7C1F4D41619B8CB3F7F173A96EC1FB236A4019839E33791A7'
   checksumType   = 'sha256'
 
   # Destination path for the portable exe

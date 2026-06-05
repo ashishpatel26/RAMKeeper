@@ -19,13 +19,13 @@ The binary included in (or downloaded by) this package can be verified as follow
    PowerShell command:
      (Get-FileHash -Algorithm SHA256 "RAMKeeper.exe").Hash
 
-   Expected SHA-256: F5C2DD91C0EC523267BCFBDEC9141069BCC97BE5CF13739EDAFA091A6FD5A586
+   Expected SHA-256: 1DDA51E9A7A29BF7C1F4D41619B8CB3F7F173A96EC1FB236A4019839E33791A7
    (Replace this placeholder with the actual hash before submitting to the
     Chocolatey community repository.)
 
 File: RAMKeeper.exe
 Algorithm: SHA256
-Checksum: F5C2DD91C0EC523267BCFBDEC9141069BCC97BE5CF13739EDAFA091A6FD5A586
+Checksum: 1DDA51E9A7A29BF7C1F4D41619B8CB3F7F173A96EC1FB236A4019839E33791A7
 
 Note: The download URL above points to GitHub Releases, which is the
 official, authoritative source for this binary. The project is MIT
