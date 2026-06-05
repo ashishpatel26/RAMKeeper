@@ -13,6 +13,7 @@ set(SOURCES
     src/cleaner.cpp
     src/stats.cpp
     src/config.cpp
+    src/settings.cpp
     res/resources.rc
 )
 

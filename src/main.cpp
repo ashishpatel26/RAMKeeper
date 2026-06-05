@@ -3,6 +3,7 @@
 #include "cleaner.h"
 #include "stats.h"
 #include "config.h"
+#include "settings.h"
 #include <strsafe.h>
 
 // ---- Application state -------------------------------------------------------
@@ -175,10 +176,12 @@ static LRESULT CALLBACK WndProc(HWND hwnd, UINT msg, WPARAM wp, LPARAM lp) {
             g_app.cfg.autoClean = !g_app.cfg.autoClean;
             Config_Save(g_app.cfg);
             break;
+        case IDM_SETTINGS:
+            Settings_Show(hwnd, g_app.cfg);
+            break;
         case IDM_EXIT:
             DestroyWindow(hwnd);
             break;
-        // IDM_SETTINGS — placeholder for future settings dialog
         }
         return 0;
 
