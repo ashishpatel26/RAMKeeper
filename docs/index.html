@@ -4,7 +4,7 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>RAMKeeper — Lightweight Windows RAM Cleaner</title>
-  <meta name="description" content="142 KB RAM cleaner for Windows. Purges standby list, no ads, open source." />
+  <meta name="description" content="149 KB RAM cleaner for Windows. Purges standby list, settings dialog, no ads, open source." />
 
   <!-- Fonts -->
   <link rel="preconnect" href="https://fonts.googleapis.com" />
@@ -599,7 +599,7 @@
 <section class="hero">
   <div class="hero-badge">
     <span class="dot"></span>
-    v1.0 — Stable Release
+    v1.0.1 — Stable Release
   </div>
 
   <h1>
@@ -609,7 +609,7 @@
 
   <p>
     Windows silently fills RAM with cached standby data — even when idle.
-    RAMKeeper purges it instantly. <strong style="color:var(--text)">142 KB.</strong> No bloat. No ads. Just clean RAM.
+    RAMKeeper purges it instantly. <strong style="color:var(--text)">149 KB.</strong> No bloat. No ads. Just clean RAM.
   </p>
 
   <div class="hero-actions">
@@ -622,7 +622,7 @@
   </div>
 
   <div class="hero-stats">
-    <div class="stat-pill"><span class="ico">📦</span><span class="val">142 KB</span><span class="lbl">binary size</span></div>
+    <div class="stat-pill"><span class="ico">📦</span><span class="val">149 KB</span><span class="lbl">binary size</span></div>
     <div class="stat-pill"><span class="ico">🔒</span><span class="val">Zero</span><span class="lbl">runtime deps</span></div>
     <div class="stat-pill"><span class="ico">⚡</span><span class="val">&lt; 1s</span><span class="lbl">clean time</span></div>
     <div class="stat-pill"><span class="ico">🪟</span><span class="val">Win 7+</span><span class="lbl">compatible</span></div>
@@ -655,6 +655,11 @@
         <p>Press <kbd style="background:var(--bg-elevated);border:1px solid var(--border);border-radius:4px;padding:1px 6px;font-size:0.8rem;">Ctrl+Alt+R</kbd> anywhere to trigger an instant clean — no window to bring up, no clicks needed.</p>
       </div>
       <div class="feature-card">
+        <div class="feature-icon" style="background:rgba(20,184,166,0.15);">⚙️</div>
+        <h3>Settings Dialog</h3>
+        <p>Right-click tray → Settings to configure threshold, interval, idle timeout, boot delay, silent mode, and autostart — all in a clean native Win32 dialog. Saves instantly to <code style="font-family:JetBrains Mono,monospace;font-size:0.78rem;color:#a5b4fc;background:rgba(99,102,241,0.1);padding:2px 6px;border-radius:4px;">config.ini</code>.</p>
+      </div>
+      <div class="feature-card">
         <div class="feature-icon" style="background:rgba(34,211,164,0.15);">🔕</div>
         <h3>Silent Tray Mode</h3>
         <p>Runs as a message-only window with a system tray icon. No taskbar button. Zero visual noise. Optional balloon notifications you can silence in config.</p>
@@ -662,7 +667,7 @@
       <div class="feature-card">
         <div class="feature-icon" style="background:rgba(251,191,36,0.15);">📦</div>
         <h3>Single Portable EXE</h3>
-        <p>142 KB static binary. No installer. No Visual C++ Redistributable. No .NET. Drop it anywhere and run. Copy to a USB drive and carry it everywhere.</p>
+        <p>149 KB static binary. No installer. No Visual C++ Redistributable. No .NET. Drop it anywhere and run. Copy to a USB drive and carry it everywhere.</p>
       </div>
       <div class="feature-card">
         <div class="feature-icon" style="background:rgba(244,63,94,0.15);">🛡️</div>
@@ -716,7 +721,7 @@
 
       <div class="arch-box">
 <span class="hl">┌─────────────────────────────────────────┐</span>
-<span class="hl">│  RAMKeeper.exe  (142 KB, static)         │</span>
+<span class="hl">│  RAMKeeper.exe  (149 KB, static)         │</span>
 <span class="hl">├─────────────────────────────────────────┤</span>
 │  <span class="hl2">┌─ Tray Icon (Shell_NotifyIcon)</span>        │
 │  <span class="hl2">│   ├─ "Clean Now"</span>                     │
@@ -808,7 +813,7 @@
           <br><span class="prompt">&gt;</span> <span class="cmd">git clone https://github.com/ashishpatel26/RAMKeeper.git &amp;&amp; cd RAMKeeper</span>
           <br><span class="prompt">&gt;</span> <span class="cmd">cmake -B build -G Ninja -DCMAKE_BUILD_TYPE=Release</span>
           <br><span class="prompt">&gt;</span> <span class="cmd">cmake --build build --config Release</span>
-          <br><br><span class="out ok">✓ build\RAMKeeper.exe  —  142 KB, zero external deps</span>
+          <br><br><span class="out ok">✓ build\RAMKeeper.exe  —  149 KB, zero external deps</span>
           <br><span class="out ok">✓ dumpbin /dependents: KERNEL32 USER32 SHELL32 ADVAPI32 only</span>
         </div>
       </div>
@@ -915,7 +920,7 @@ start_with_windows = 0</code></pre>
         <tbody>
           <tr class="ours">
             <td>RAMKeeper ✦</td>
-            <td><strong style="color:var(--green)">142 KB</strong></td>
+            <td><strong style="color:var(--green)">149 KB</strong></td>
             <td><span class="tick">✓</span></td>
             <td><span class="tick">✓</span></td>
             <td><span class="tick">✓</span></td>
@@ -974,7 +979,7 @@ start_with_windows = 0</code></pre>
 
     <div class="badges">
       <span class="badge badge-purple">C++ Win32</span>
-      <span class="badge badge-green">142 KB binary</span>
+      <span class="badge badge-green">149 KB binary</span>
       <span class="badge badge-pink">MIT License</span>
       <span class="badge badge-orange">Windows 7+</span>
     </div>
