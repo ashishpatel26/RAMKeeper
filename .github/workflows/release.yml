@@ -1,0 +1,75 @@
+name: Build & Release
+
+on:
+  push:
+    tags:
+      - "v*"          # triggers on v1.0.0, v1.2.3, etc.
+  workflow_dispatch:  # manual trigger from GitHub UI
+
+permissions:
+  contents: write   # needed to create releases and upload assets
+
+jobs:
+  build:
+    runs-on: windows-latest
+    name: Build RAMKeeper (MSVC, static)
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup MSVC
+        uses: microsoft/setup-msbuild@v2
+
+      - name: Install Ninja
+        run: choco install ninja -y --no-progress
+
+      - name: Configure CMake
+        shell: cmd
+        run: |
+          call "C:\Program Files\Microsoft Visual Studio\2022\Enterprise\VC\Auxiliary\Build\vcvars64.bat"
+          cmake -B build -G Ninja -DCMAKE_BUILD_TYPE=Release -S .
+
+      - name: Build
+        shell: cmd
+        run: |
+          call "C:\Program Files\Microsoft Visual Studio\2022\Enterprise\VC\Auxiliary\Build\vcvars64.bat"
+          cmake --build build --config Release
+
+      - name: Show binary info
+        shell: pwsh
+        run: |
+          $f = Get-Item "build\RAMKeeper.exe"
+          Write-Host "Size: $([math]::Round($f.Length/1KB,1)) KB"
+          dumpbin /dependents build\RAMKeeper.exe
+
+      - name: Upload artifact (for non-tag builds)
+        uses: actions/upload-artifact@v4
+        with:
+          name: RAMKeeper
+          path: build\RAMKeeper.exe
+          if-no-files-found: error
+
+      - name: Create GitHub Release (tag builds only)
+        if: startsWith(github.ref, 'refs/tags/')
+        uses: softprops/action-gh-release@v2
+        with:
+          files: build\RAMKeeper.exe
+          name: "RAMKeeper ${{ github.ref_name }}"
+          body: |
+            ## RAMKeeper ${{ github.ref_name }}
+
+            ### Download
+            **[RAMKeeper.exe](https://github.com/${{ github.repository }}/releases/download/${{ github.ref_name }}/RAMKeeper.exe)** — lightweight Windows RAM cleaner.
+
+            Run as **Administrator** → tray icon appears → right-click for menu.
+
+            ### Requirements
+            - Windows 7+ (x64)
+            - Administrator privileges
+            - No runtime dependencies
+
+            ### Hotkey
+            `Ctrl+Alt+R` — clean RAM instantly from anywhere.
+          draft: false
+          prerelease: ${{ contains(github.ref_name, 'beta') || contains(github.ref_name, 'rc') }}
