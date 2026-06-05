@@ -1,0 +1,1045 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>RAMKeeper — Lightweight Windows RAM Cleaner</title>
+  <meta name="description" content="142 KB RAM cleaner for Windows. Purges standby list, no ads, open source." />
+
+  <!-- Fonts -->
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet" />
+
+  <!-- Prism.js syntax highlighting -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/themes/prism-tomorrow.min.css" />
+
+  <style>
+    :root {
+      --bg:          #0d0d0f;
+      --bg-card:     #141418;
+      --bg-elevated: #1a1a20;
+      --border:      rgba(255,255,255,0.07);
+      --border-acc:  rgba(99,102,241,0.4);
+      --text:        #e2e4ea;
+      --text-muted:  #7a7f8e;
+      --text-dim:    #4a4f60;
+      --accent:      #6366f1;
+      --accent-2:    #a855f7;
+      --accent-3:    #ec4899;
+      --green:       #22d3a4;
+      --red:         #f43f5e;
+      --yellow:      #fbbf24;
+      --radius:      12px;
+      --radius-lg:   20px;
+      --shadow:      0 4px 24px rgba(0,0,0,0.5);
+      --shadow-lg:   0 20px 60px rgba(0,0,0,0.6);
+      --nav-h:       64px;
+    }
+
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    html { scroll-behavior: smooth; font-size: 16px; }
+
+    body {
+      font-family: 'Inter', system-ui, sans-serif;
+      background: var(--bg);
+      color: var(--text);
+      line-height: 1.7;
+      -webkit-font-smoothing: antialiased;
+      overflow-x: hidden;
+    }
+
+    /* ── NOISE TEXTURE OVERLAY ── */
+    body::before {
+      content: '';
+      position: fixed; inset: 0;
+      background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='0.03'/%3E%3C/svg%3E");
+      pointer-events: none; z-index: 0; opacity: 0.4;
+    }
+
+    /* ── NAV ── */
+    nav {
+      position: fixed; top: 0; left: 0; right: 0;
+      height: var(--nav-h);
+      background: rgba(13,13,15,0.85);
+      backdrop-filter: blur(20px) saturate(180%);
+      border-bottom: 1px solid var(--border);
+      display: flex; align-items: center;
+      padding: 0 2rem;
+      z-index: 100;
+      gap: 2rem;
+    }
+
+    .nav-logo {
+      display: flex; align-items: center; gap: 10px;
+      font-weight: 700; font-size: 1.1rem; color: var(--text);
+      text-decoration: none;
+    }
+
+    .nav-logo .chip-icon {
+      width: 32px; height: 32px;
+      background: linear-gradient(135deg, var(--accent), var(--accent-2));
+      border-radius: 8px;
+      display: flex; align-items: center; justify-content: center;
+      font-size: 16px;
+    }
+
+    .nav-links {
+      display: flex; gap: 0.25rem; margin-left: auto;
+      list-style: none;
+    }
+
+    .nav-links a {
+      color: var(--text-muted);
+      text-decoration: none;
+      font-size: 0.875rem;
+      font-weight: 500;
+      padding: 6px 14px;
+      border-radius: 8px;
+      transition: color 0.2s, background 0.2s;
+    }
+    .nav-links a:hover { color: var(--text); background: var(--bg-elevated); }
+
+    .nav-cta {
+      margin-left: 1rem;
+      background: linear-gradient(135deg, var(--accent), var(--accent-2)) !important;
+      color: white !important;
+      padding: 8px 18px !important;
+      border-radius: 8px !important;
+      font-weight: 600 !important;
+      font-size: 0.875rem !important;
+    }
+    .nav-cta:hover { opacity: 0.9; transform: translateY(-1px); }
+
+    /* ── HERO ── */
+    .hero {
+      min-height: 100vh;
+      display: flex; align-items: center; justify-content: center;
+      flex-direction: column; text-align: center;
+      padding: calc(var(--nav-h) + 4rem) 2rem 6rem;
+      position: relative;
+      overflow: hidden;
+    }
+
+    /* gradient orbs */
+    .hero::after {
+      content: '';
+      position: absolute;
+      top: 10%; left: 50%;
+      transform: translateX(-50%);
+      width: 900px; height: 500px;
+      background: radial-gradient(ellipse at 30% 40%, rgba(99,102,241,0.15) 0%, transparent 60%),
+                  radial-gradient(ellipse at 70% 60%, rgba(168,85,247,0.12) 0%, transparent 60%),
+                  radial-gradient(ellipse at 50% 80%, rgba(236,72,153,0.08) 0%, transparent 60%);
+      pointer-events: none;
+      z-index: -1;
+    }
+
+    .hero-badge {
+      display: inline-flex; align-items: center; gap: 8px;
+      background: rgba(99,102,241,0.1);
+      border: 1px solid rgba(99,102,241,0.25);
+      border-radius: 100px;
+      padding: 6px 16px;
+      font-size: 0.8rem; font-weight: 600;
+      color: #a5b4fc;
+      margin-bottom: 2rem;
+      letter-spacing: 0.03em;
+    }
+    .hero-badge .dot { width: 6px; height: 6px; background: var(--green); border-radius: 50%; animation: pulse 2s infinite; }
+    @keyframes pulse { 0%,100%{opacity:1;transform:scale(1)} 50%{opacity:0.5;transform:scale(1.4)} }
+
+    .hero h1 {
+      font-size: clamp(2.8rem, 6vw, 5rem);
+      font-weight: 800;
+      letter-spacing: -0.03em;
+      line-height: 1.1;
+      margin-bottom: 1.5rem;
+      max-width: 800px;
+    }
+
+    .hero h1 .gradient {
+      background: linear-gradient(135deg, #818cf8 0%, #c084fc 50%, #f472b6 100%);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+    }
+
+    .hero p {
+      font-size: 1.2rem;
+      color: var(--text-muted);
+      max-width: 560px;
+      margin-bottom: 2.5rem;
+      line-height: 1.8;
+    }
+
+    .hero-actions {
+      display: flex; gap: 1rem; flex-wrap: wrap; justify-content: center;
+      margin-bottom: 4rem;
+    }
+
+    .btn-primary {
+      display: inline-flex; align-items: center; gap: 8px;
+      background: linear-gradient(135deg, var(--accent), var(--accent-2));
+      color: white;
+      text-decoration: none;
+      padding: 14px 28px;
+      border-radius: var(--radius);
+      font-weight: 700;
+      font-size: 1rem;
+      transition: all 0.25s;
+      box-shadow: 0 0 40px rgba(99,102,241,0.3);
+    }
+    .btn-primary:hover { transform: translateY(-2px); box-shadow: 0 0 60px rgba(99,102,241,0.5); }
+
+    .btn-ghost {
+      display: inline-flex; align-items: center; gap: 8px;
+      color: var(--text-muted);
+      text-decoration: none;
+      padding: 14px 28px;
+      border-radius: var(--radius);
+      border: 1px solid var(--border);
+      font-weight: 600;
+      font-size: 1rem;
+      background: var(--bg-card);
+      transition: all 0.25s;
+    }
+    .btn-ghost:hover { border-color: var(--border-acc); color: var(--text); background: var(--bg-elevated); }
+
+    /* STAT PILLS */
+    .hero-stats {
+      display: flex; gap: 1rem; flex-wrap: wrap; justify-content: center;
+    }
+    .stat-pill {
+      display: flex; align-items: center; gap: 10px;
+      background: var(--bg-card);
+      border: 1px solid var(--border);
+      border-radius: 100px;
+      padding: 10px 20px;
+      font-size: 0.875rem;
+    }
+    .stat-pill .val { font-weight: 700; color: var(--text); }
+    .stat-pill .lbl { color: var(--text-muted); }
+    .stat-pill .ico { font-size: 1rem; }
+
+    /* ── SECTIONS ── */
+    section { padding: 6rem 2rem; position: relative; z-index: 1; }
+    .container { max-width: 1100px; margin: 0 auto; }
+
+    .section-label {
+      display: inline-block;
+      font-size: 0.75rem;
+      font-weight: 700;
+      letter-spacing: 0.12em;
+      text-transform: uppercase;
+      color: var(--accent);
+      margin-bottom: 1rem;
+    }
+
+    .section-title {
+      font-size: clamp(1.8rem, 3.5vw, 2.8rem);
+      font-weight: 800;
+      letter-spacing: -0.025em;
+      line-height: 1.2;
+      margin-bottom: 1rem;
+    }
+
+    .section-sub {
+      color: var(--text-muted);
+      font-size: 1.05rem;
+      max-width: 520px;
+      margin-bottom: 3.5rem;
+    }
+
+    /* ── DIVIDER ── */
+    .divider {
+      height: 1px;
+      background: linear-gradient(90deg, transparent, var(--border), transparent);
+    }
+
+    /* ── FEATURES GRID ── */
+    .features-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+      gap: 1px;
+      background: var(--border);
+      border-radius: var(--radius-lg);
+      overflow: hidden;
+      border: 1px solid var(--border);
+    }
+
+    .feature-card {
+      background: var(--bg-card);
+      padding: 2rem;
+      transition: background 0.2s;
+      position: relative;
+      overflow: hidden;
+    }
+    .feature-card::before {
+      content: '';
+      position: absolute; top: 0; left: 0; right: 0;
+      height: 2px;
+      background: linear-gradient(90deg, var(--accent), var(--accent-2));
+      opacity: 0;
+      transition: opacity 0.3s;
+    }
+    .feature-card:hover { background: var(--bg-elevated); }
+    .feature-card:hover::before { opacity: 1; }
+
+    .feature-icon {
+      width: 44px; height: 44px;
+      border-radius: 10px;
+      display: flex; align-items: center; justify-content: center;
+      font-size: 1.3rem;
+      margin-bottom: 1.25rem;
+    }
+
+    .feature-card h3 {
+      font-size: 1rem;
+      font-weight: 700;
+      margin-bottom: 0.5rem;
+    }
+
+    .feature-card p {
+      font-size: 0.875rem;
+      color: var(--text-muted);
+      line-height: 1.7;
+    }
+
+    /* ── HOW IT WORKS ── */
+    .steps {
+      display: flex; flex-direction: column; gap: 0;
+      position: relative;
+    }
+
+    .steps::before {
+      content: '';
+      position: absolute;
+      left: 24px; top: 48px; bottom: 48px;
+      width: 1px;
+      background: linear-gradient(to bottom, var(--accent), var(--accent-2), transparent);
+    }
+
+    .step {
+      display: flex; gap: 2rem;
+      padding: 2rem;
+      border-radius: var(--radius);
+      transition: background 0.2s;
+      cursor: default;
+    }
+    .step:hover { background: var(--bg-card); }
+
+    .step-num {
+      width: 48px; height: 48px; flex-shrink: 0;
+      border-radius: 50%;
+      background: linear-gradient(135deg, var(--accent), var(--accent-2));
+      display: flex; align-items: center; justify-content: center;
+      font-weight: 800; font-size: 0.9rem;
+      box-shadow: 0 0 20px rgba(99,102,241,0.4);
+      position: relative; z-index: 1;
+    }
+
+    .step-content h3 {
+      font-size: 1.1rem; font-weight: 700;
+      margin-bottom: 0.4rem;
+    }
+    .step-content p {
+      color: var(--text-muted);
+      font-size: 0.9rem;
+      line-height: 1.7;
+    }
+    .step-content code {
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 0.8rem;
+      color: #a5b4fc;
+      background: rgba(99,102,241,0.1);
+      padding: 2px 8px;
+      border-radius: 4px;
+    }
+
+    /* ── CONFIG SECTION ── */
+    .config-wrap {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 2rem;
+      align-items: start;
+    }
+
+    @media (max-width: 768px) {
+      .config-wrap { grid-template-columns: 1fr; }
+      nav { padding: 0 1rem; }
+      .nav-links { display: none; }
+    }
+
+    .config-prose h3 {
+      font-size: 1.4rem; font-weight: 700;
+      margin-bottom: 1rem;
+    }
+    .config-prose p { color: var(--text-muted); font-size: 0.95rem; line-height: 1.8; margin-bottom: 1.5rem; }
+
+    .config-item {
+      display: flex; align-items: flex-start; gap: 12px;
+      padding: 1rem;
+      border-radius: var(--radius);
+      background: var(--bg-card);
+      border: 1px solid var(--border);
+      margin-bottom: 0.75rem;
+      transition: border-color 0.2s;
+    }
+    .config-item:hover { border-color: var(--border-acc); }
+    .config-item .key {
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 0.8rem;
+      color: #a5b4fc;
+      white-space: nowrap;
+      min-width: 160px;
+    }
+    .config-item .desc { font-size: 0.85rem; color: var(--text-muted); }
+
+    /* CODE BLOCK */
+    .code-block {
+      background: #0a0a0c;
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      overflow: hidden;
+    }
+    .code-header {
+      display: flex; align-items: center; justify-content: space-between;
+      padding: 12px 16px;
+      border-bottom: 1px solid var(--border);
+      background: var(--bg-card);
+    }
+    .code-header .dots { display: flex; gap: 6px; }
+    .code-header .dot { width: 12px; height: 12px; border-radius: 50%; }
+    .dot-r { background: #f43f5e; } .dot-y { background: #fbbf24; } .dot-g { background: #22d3a4; }
+    .code-header .filename { font-family: 'JetBrains Mono', monospace; font-size: 0.8rem; color: var(--text-muted); }
+    .code-header .copy-btn {
+      font-size: 0.75rem; color: var(--text-muted);
+      background: var(--bg-elevated); border: 1px solid var(--border);
+      border-radius: 6px; padding: 4px 10px; cursor: pointer;
+      transition: all 0.2s; font-family: 'Inter', sans-serif;
+    }
+    .copy-btn:hover { color: var(--text); border-color: var(--accent); }
+    .code-block pre { margin: 0 !important; border-radius: 0 !important; background: transparent !important; }
+    .code-block pre code { font-size: 0.82rem !important; line-height: 1.7 !important; }
+
+    /* ── COMPARISON ── */
+    .compare-table {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: 0.9rem;
+    }
+    .compare-table th {
+      padding: 14px 20px;
+      text-align: left;
+      font-weight: 700;
+      font-size: 0.8rem;
+      letter-spacing: 0.05em;
+      text-transform: uppercase;
+      color: var(--text-muted);
+      border-bottom: 1px solid var(--border);
+    }
+    .compare-table th:first-child { border-radius: var(--radius) 0 0 0; }
+    .compare-table th:last-child { border-radius: 0 var(--radius) 0 0; }
+    .compare-table tr { border-bottom: 1px solid var(--border); transition: background 0.15s; }
+    .compare-table tr:hover td { background: var(--bg-elevated); }
+    .compare-table td { padding: 14px 20px; }
+    .compare-table td:first-child { font-weight: 600; }
+    .compare-table .ours td { background: rgba(99,102,241,0.06); }
+    .compare-table .ours td:first-child { color: #818cf8; font-weight: 700; }
+    .tick { color: var(--green); font-size: 1.1rem; }
+    .cross { color: var(--red); font-size: 1rem; }
+    .partial { color: var(--yellow); font-size: 1rem; }
+
+    /* ── INSTALL SECTION ── */
+    .install-tabs {
+      display: flex; gap: 0.5rem; margin-bottom: 1.5rem;
+      border-bottom: 1px solid var(--border); padding-bottom: 0;
+    }
+    .tab {
+      padding: 10px 20px; cursor: pointer;
+      font-size: 0.875rem; font-weight: 600;
+      color: var(--text-muted);
+      border-bottom: 2px solid transparent;
+      margin-bottom: -1px;
+      transition: all 0.2s;
+      background: none; border-left: none; border-right: none; border-top: none;
+      font-family: 'Inter', sans-serif;
+    }
+    .tab:hover { color: var(--text); }
+    .tab.active { color: var(--accent); border-bottom-color: var(--accent); }
+    .tab-content { display: none; }
+    .tab-content.active { display: block; }
+
+    /* ── TERMINAL ── */
+    .terminal {
+      background: #060608;
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      overflow: hidden;
+      font-family: 'JetBrains Mono', monospace;
+    }
+    .terminal-bar {
+      background: var(--bg-card);
+      padding: 10px 16px;
+      display: flex; align-items: center; gap: 8px;
+      border-bottom: 1px solid var(--border);
+    }
+    .terminal-bar span { font-size: 0.75rem; color: var(--text-muted); }
+    .terminal-body { padding: 1.5rem; font-size: 0.82rem; line-height: 2; }
+    .terminal-body .prompt { color: var(--green); }
+    .terminal-body .cmd { color: var(--text); }
+    .terminal-body .out { color: var(--text-muted); display: block; }
+    .terminal-body .ok { color: var(--green); }
+    .terminal-body .comment { color: var(--text-dim); }
+
+    /* ── DOWNLOAD HERO ── */
+    .download-section {
+      text-align: center;
+      padding: 6rem 2rem;
+      background: linear-gradient(to bottom, transparent, rgba(99,102,241,0.04), transparent);
+    }
+    .download-section h2 {
+      font-size: clamp(2rem, 4vw, 3.2rem);
+      font-weight: 800;
+      letter-spacing: -0.025em;
+      margin-bottom: 1rem;
+    }
+    .download-section p { color: var(--text-muted); font-size: 1.1rem; margin-bottom: 2.5rem; }
+
+    .download-card {
+      display: inline-flex; align-items: center; gap: 1.5rem;
+      background: var(--bg-card);
+      border: 1px solid var(--border-acc);
+      border-radius: var(--radius-lg);
+      padding: 1.5rem 2rem;
+      margin-bottom: 2rem;
+      text-align: left;
+    }
+    .download-card .icon { font-size: 2.5rem; }
+    .download-card .info .name { font-weight: 700; font-size: 1.1rem; }
+    .download-card .info .meta { font-size: 0.85rem; color: var(--text-muted); margin-top: 2px; }
+
+    /* ── FOOTER ── */
+    footer {
+      border-top: 1px solid var(--border);
+      padding: 3rem 2rem;
+      text-align: center;
+      color: var(--text-muted);
+      font-size: 0.875rem;
+    }
+    footer a { color: var(--accent); text-decoration: none; }
+    footer a:hover { text-decoration: underline; }
+    .footer-links { display: flex; gap: 2rem; justify-content: center; margin-bottom: 1.5rem; flex-wrap: wrap; }
+
+    /* ── BADGE ROW ── */
+    .badges { display: flex; gap: 0.5rem; flex-wrap: wrap; justify-content: center; margin-bottom: 3rem; }
+    .badge {
+      padding: 4px 12px;
+      border-radius: 100px;
+      font-size: 0.75rem; font-weight: 600;
+      border: 1px solid;
+    }
+    .badge-purple { background: rgba(99,102,241,0.1); border-color: rgba(99,102,241,0.3); color: #a5b4fc; }
+    .badge-green  { background: rgba(34,211,164,0.1); border-color: rgba(34,211,164,0.3); color: #6ee7b7; }
+    .badge-pink   { background: rgba(244,63,94,0.1);  border-color: rgba(244,63,94,0.3);  color: #fda4af; }
+    .badge-orange { background: rgba(251,191,36,0.1); border-color: rgba(251,191,36,0.3); color: #fde68a; }
+
+    /* ── SCROLL ANIMATIONS ── */
+    .fade-in { opacity: 0; transform: translateY(24px); transition: opacity 0.6s ease, transform 0.6s ease; }
+    .fade-in.visible { opacity: 1; transform: none; }
+
+    /* ── GLOWING SEPARATOR ── */
+    .glow-sep {
+      width: 80px; height: 3px;
+      background: linear-gradient(90deg, var(--accent), var(--accent-2));
+      border-radius: 2px;
+      margin: 1rem 0 2rem;
+    }
+
+    /* ── ARCHITECTURE DIAGRAM ── */
+    .arch-box {
+      background: var(--bg-card);
+      border: 1px solid var(--border);
+      border-radius: var(--radius-lg);
+      padding: 2rem;
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 0.78rem;
+      line-height: 1.8;
+      color: var(--text-muted);
+      overflow-x: auto;
+      position: relative;
+    }
+    .arch-box .hl  { color: #818cf8; }
+    .arch-box .hl2 { color: #6ee7b7; }
+    .arch-box .hl3 { color: #fda4af; }
+    .arch-box .hl4 { color: #fde68a; }
+  </style>
+</head>
+<body>
+
+<!-- ── NAVIGATION ── -->
+<nav>
+  <a href="#" class="nav-logo">
+    <div class="chip-icon">🧹</div>
+    RAMKeeper
+  </a>
+  <ul class="nav-links">
+    <li><a href="#features">Features</a></li>
+    <li><a href="#how-it-works">How it Works</a></li>
+    <li><a href="#install">Install</a></li>
+    <li><a href="#config">Config</a></li>
+    <li><a href="#compare">Compare</a></li>
+    <li><a href="https://github.com/ashishpatel26/RAMKeeper" target="_blank" class="nav-cta">↓ Download</a></li>
+  </ul>
+</nav>
+
+<!-- ── HERO ── -->
+<section class="hero">
+  <div class="hero-badge">
+    <span class="dot"></span>
+    v1.0 — Stable Release
+  </div>
+
+  <h1>
+    Keep Your Windows RAM<br/>
+    <span class="gradient">Actually Free</span>
+  </h1>
+
+  <p>
+    Windows silently fills RAM with cached standby data — even when idle.
+    RAMKeeper purges it instantly. <strong style="color:var(--text)">142 KB.</strong> No bloat. No ads. Just clean RAM.
+  </p>
+
+  <div class="hero-actions">
+    <a href="https://github.com/ashishpatel26/RAMKeeper/releases/latest" class="btn-primary">
+      ⬇&nbsp; Download for Windows
+    </a>
+    <a href="https://github.com/ashishpatel26/RAMKeeper" class="btn-ghost">
+      ⭐&nbsp; Star on GitHub
+    </a>
+  </div>
+
+  <div class="hero-stats">
+    <div class="stat-pill"><span class="ico">📦</span><span class="val">142 KB</span><span class="lbl">binary size</span></div>
+    <div class="stat-pill"><span class="ico">🔒</span><span class="val">Zero</span><span class="lbl">runtime deps</span></div>
+    <div class="stat-pill"><span class="ico">⚡</span><span class="val">&lt; 1s</span><span class="lbl">clean time</span></div>
+    <div class="stat-pill"><span class="ico">🪟</span><span class="val">Win 7+</span><span class="lbl">compatible</span></div>
+  </div>
+</section>
+
+<div class="divider"></div>
+
+<!-- ── FEATURES ── -->
+<section id="features">
+  <div class="container">
+    <span class="section-label">Features</span>
+    <h2 class="section-title">Everything you need.<br/>Nothing you don't.</h2>
+    <div class="glow-sep"></div>
+
+    <div class="features-grid fade-in">
+      <div class="feature-card">
+        <div class="feature-icon" style="background:rgba(99,102,241,0.15);">🧹</div>
+        <h3>Standby List Purge</h3>
+        <p>Calls <code style="font-family:JetBrains Mono,monospace;font-size:0.78rem;color:#a5b4fc;background:rgba(99,102,241,0.1);padding:2px 6px;border-radius:4px;">NtSetSystemInformation</code> directly to flush the kernel standby and modified memory lists — something Task Manager simply cannot do.</p>
+      </div>
+      <div class="feature-card">
+        <div class="feature-icon" style="background:rgba(168,85,247,0.15);">🕒</div>
+        <h3>Auto-Clean Triggers</h3>
+        <p>Clean automatically when RAM crosses a threshold %, on a fixed interval, when the user is idle, or once after boot — all configurable via a plain INI file.</p>
+      </div>
+      <div class="feature-card">
+        <div class="feature-icon" style="background:rgba(236,72,153,0.15);">⌨️</div>
+        <h3>Global Hotkey</h3>
+        <p>Press <kbd style="background:var(--bg-elevated);border:1px solid var(--border);border-radius:4px;padding:1px 6px;font-size:0.8rem;">Ctrl+Alt+R</kbd> anywhere to trigger an instant clean — no window to bring up, no clicks needed.</p>
+      </div>
+      <div class="feature-card">
+        <div class="feature-icon" style="background:rgba(34,211,164,0.15);">🔕</div>
+        <h3>Silent Tray Mode</h3>
+        <p>Runs as a message-only window with a system tray icon. No taskbar button. Zero visual noise. Optional balloon notifications you can silence in config.</p>
+      </div>
+      <div class="feature-card">
+        <div class="feature-icon" style="background:rgba(251,191,36,0.15);">📦</div>
+        <h3>Single Portable EXE</h3>
+        <p>142 KB static binary. No installer. No Visual C++ Redistributable. No .NET. Drop it anywhere and run. Copy to a USB drive and carry it everywhere.</p>
+      </div>
+      <div class="feature-card">
+        <div class="feature-icon" style="background:rgba(244,63,94,0.15);">🛡️</div>
+        <h3>Open Source & Signed</h3>
+        <p>Full C++ Win32 source on GitHub. MIT licensed. Code-signed binary to avoid Defender false positives. Audit every line yourself.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<div class="divider"></div>
+
+<!-- ── HOW IT WORKS ── -->
+<section id="how-it-works">
+  <div class="container">
+    <span class="section-label">How It Works</span>
+    <h2 class="section-title">Four kernel calls.<br/>Serious results.</h2>
+    <div class="glow-sep"></div>
+
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:3rem;align-items:start;" class="fade-in">
+      <div class="steps">
+        <div class="step">
+          <div class="step-num">1</div>
+          <div class="step-content">
+            <h3>Trim Working Sets</h3>
+            <p>Iterates all running processes via <code>EnumProcesses</code>, opens each with <code>PROCESS_SET_QUOTA</code>, calls <code>EmptyWorkingSet</code>. Moves private pages to the standby list — works without admin.</p>
+          </div>
+        </div>
+        <div class="step">
+          <div class="step-num">2</div>
+          <div class="step-content">
+            <h3>Flush Modified List</h3>
+            <p><code>NtSetSystemInformation(80, MemoryFlushModifiedList)</code> — writes dirty modified pages to the page file, moving them to standby. Requires admin.</p>
+          </div>
+        </div>
+        <div class="step">
+          <div class="step-num">3</div>
+          <div class="step-content">
+            <h3>Purge Standby List</h3>
+            <p><code>NtSetSystemInformation(80, MemoryPurgeStandbyList)</code> — the main event. Evicts all standby pages, immediately freeing them as available RAM. Admin required.</p>
+          </div>
+        </div>
+        <div class="step">
+          <div class="step-num">4</div>
+          <div class="step-content">
+            <h3>Reset File Cache</h3>
+            <p><code>SetSystemFileCacheSize(-1, -1, 0)</code> resets Windows' file system cache size limits, releasing cached file data back to the free pool.</p>
+          </div>
+        </div>
+      </div>
+
+      <div class="arch-box">
+<span class="hl">┌─────────────────────────────────────────┐</span>
+<span class="hl">│  RAMKeeper.exe  (142 KB, static)         │</span>
+<span class="hl">├─────────────────────────────────────────┤</span>
+│  <span class="hl2">┌─ Tray Icon (Shell_NotifyIcon)</span>        │
+│  <span class="hl2">│   ├─ "Clean Now"</span>                     │
+│  <span class="hl2">│   ├─ "Auto-clean: ON/OFF"</span>             │
+│  <span class="hl2">│   └─ "Exit"</span>                          │
+│  │                                      │
+│  <span class="hl3">├─ Background Timer (1s tick)</span>          │
+│  <span class="hl3">│   ├─ Poll RAM (GlobalMemoryStatusEx)  </span>│
+│  <span class="hl3">│   ├─ usage &gt; threshold? → Clean()</span>   │
+│  <span class="hl3">│   └─ Update tooltip "8.3/16 GB"</span>     │
+│  │                                      │
+│  <span class="hl4">├─ Clean() routine</span>                    │
+│  <span class="hl4">│   1. EmptyWorkingSet × all PIDs</span>      │
+│  <span class="hl4">│   2. NtSetSystemInfo(FlushModified)</span>  │
+│  <span class="hl4">│   3. NtSetSystemInfo(PurgeStandby)</span>   │
+│  <span class="hl4">│   4. SetSystemFileCacheSize(-1,-1,0)</span> │
+│  │                                      │
+│  <span class="hl">├─ Hotkey: Ctrl+Alt+R → Clean Now</span>     │
+│  <span class="hl">└─ Config: %APPDATA%\RAMKeeper\cfg.ini </span>│
+<span class="hl">└─────────────────────────────────────────┘</span>
+      </div>
+    </div>
+  </div>
+</section>
+
+<div class="divider"></div>
+
+<!-- ── INSTALL ── -->
+<section id="install">
+  <div class="container">
+    <span class="section-label">Installation</span>
+    <h2 class="section-title">Up and running<br/>in 30 seconds.</h2>
+    <div class="glow-sep"></div>
+
+    <div class="install-tabs fade-in">
+      <button class="tab active" onclick="switchTab(this,'tab-portable')">📦 Portable</button>
+      <button class="tab" onclick="switchTab(this,'tab-autostart')">🚀 Auto-start</button>
+      <button class="tab" onclick="switchTab(this,'tab-source')">🔨 Build from Source</button>
+    </div>
+
+    <div id="tab-portable" class="tab-content active">
+      <div class="terminal">
+        <div class="terminal-bar">
+          <div class="code-header"><div class="dots"><div class="dot dot-r"></div><div class="dot dot-y"></div><div class="dot dot-g"></div></div></div>
+          <span>PowerShell</span>
+        </div>
+        <div class="terminal-body">
+          <span class="comment"># 1. Download the latest release</span>
+          <br><span class="prompt">PS&gt;</span> <span class="cmd">Invoke-WebRequest https://github.com/ashishpatel26/RAMKeeper/releases/latest/download/RAMKeeper.exe -OutFile RAMKeeper.exe</span>
+          <br><br><span class="comment"># 2. Run as Administrator (required for standby purge)</span>
+          <br><span class="prompt">PS&gt;</span> <span class="cmd">Start-Process RAMKeeper.exe -Verb RunAs</span>
+          <br><br><span class="out ok">✓ Tray icon appears in system tray. Right-click for menu.</span>
+        </div>
+      </div>
+      <p style="margin-top:1rem;font-size:0.85rem;color:var(--text-muted);">
+        Or just <a href="https://github.com/ashishpatel26/RAMKeeper/releases/latest" style="color:var(--accent)">download the EXE directly</a>, right-click → Run as administrator.
+      </p>
+    </div>
+
+    <div id="tab-autostart" class="tab-content">
+      <div class="terminal">
+        <div class="terminal-bar">
+          <div class="code-header"><div class="dots"><div class="dot dot-r"></div><div class="dot dot-y"></div><div class="dot dot-g"></div></div></div>
+          <span>Task Scheduler (no UAC at every boot)</span>
+        </div>
+        <div class="terminal-body">
+          <span class="comment"># Create a scheduled task to run at logon with highest privileges</span>
+          <br><span class="prompt">PS&gt;</span> <span class="cmd">$action  = New-ScheduledTaskAction -Execute "C:\Tools\RAMKeeper.exe"</span>
+          <br><span class="prompt">PS&gt;</span> <span class="cmd">$trigger = New-ScheduledTaskTrigger -AtLogOn</span>
+          <br><span class="prompt">PS&gt;</span> <span class="cmd">$settings = New-ScheduledTaskSettingsSet -RunOnlyIfNetworkAvailable:$false</span>
+          <br><span class="prompt">PS&gt;</span> <span class="cmd">Register-ScheduledTask -TaskName "RAMKeeper" -Action $action `</span>
+          <br><span class="cmd">    -Trigger $trigger -Settings $settings `</span>
+          <br><span class="cmd">    -RunLevel Highest -Force</span>
+          <br><br><span class="out ok">✓ RAMKeeper launches elevated at every login — no UAC prompt.</span>
+        </div>
+      </div>
+    </div>
+
+    <div id="tab-source" class="tab-content">
+      <div class="terminal">
+        <div class="terminal-bar">
+          <div class="code-header"><div class="dots"><div class="dot dot-r"></div><div class="dot dot-y"></div><div class="dot dot-g"></div></div></div>
+          <span>Developer Command Prompt for VS 2022</span>
+        </div>
+        <div class="terminal-body">
+          <span class="comment"># Prerequisites</span>
+          <br><span class="prompt">PS&gt;</span> <span class="cmd">winget install Microsoft.VisualStudio.2022.BuildTools Kitware.CMake Ninja-build.Ninja</span>
+          <br><br><span class="comment"># Clone and build</span>
+          <br><span class="prompt">&gt;</span> <span class="cmd">git clone https://github.com/ashishpatel26/RAMKeeper.git &amp;&amp; cd RAMKeeper</span>
+          <br><span class="prompt">&gt;</span> <span class="cmd">cmake -B build -G Ninja -DCMAKE_BUILD_TYPE=Release</span>
+          <br><span class="prompt">&gt;</span> <span class="cmd">cmake --build build --config Release</span>
+          <br><br><span class="out ok">✓ build\RAMKeeper.exe  —  142 KB, zero external deps</span>
+          <br><span class="out ok">✓ dumpbin /dependents: KERNEL32 USER32 SHELL32 ADVAPI32 only</span>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<div class="divider"></div>
+
+<!-- ── CONFIG ── -->
+<section id="config">
+  <div class="container">
+    <span class="section-label">Configuration</span>
+    <h2 class="section-title">Plain INI.<br/>No registry maze.</h2>
+    <div class="glow-sep"></div>
+
+    <div class="config-wrap fade-in">
+      <div class="config-prose">
+        <h3>%APPDATA%\RAMKeeper\config.ini</h3>
+        <p>Created automatically on first run with safe defaults. Edit with any text editor — changes apply at next timer tick (within 1 second). No restart needed.</p>
+        <div class="config-item">
+          <span class="key">threshold_percent</span>
+          <span class="desc">Trigger auto-clean when RAM usage exceeds this %. Default: <strong>80</strong></span>
+        </div>
+        <div class="config-item">
+          <span class="key">interval_minutes</span>
+          <span class="desc">Force clean every N minutes regardless of usage. 0 = disabled. Default: <strong>30</strong></span>
+        </div>
+        <div class="config-item">
+          <span class="key">on_idle_minutes</span>
+          <span class="desc">Clean if no keyboard/mouse input for N minutes. 0 = disabled. Default: <strong>5</strong></span>
+        </div>
+        <div class="config-item">
+          <span class="key">on_boot_delay</span>
+          <span class="desc">One-time clean N seconds after launch. 0 = disabled. Default: <strong>60</strong></span>
+        </div>
+        <div class="config-item">
+          <span class="key">silent_mode</span>
+          <span class="desc">Suppress balloon notifications. <strong>0</strong> = show, <strong>1</strong> = silent</span>
+        </div>
+        <div class="config-item">
+          <span class="key">start_with_windows</span>
+          <span class="desc">Add to registry Run key. <strong>0</strong> = no, <strong>1</strong> = yes</span>
+        </div>
+      </div>
+
+      <div>
+        <div class="code-block">
+          <div class="code-header">
+            <div class="dots"><div class="dot dot-r"></div><div class="dot dot-y"></div><div class="dot dot-g"></div></div>
+            <span class="filename">config.ini</span>
+            <button class="copy-btn" onclick="copyCode(this)">Copy</button>
+          </div>
+          <pre><code class="language-ini">[Clean]
+; Auto-clean when RAM use exceeds 80%
+threshold_percent = 80
+
+; Force clean every 30 minutes
+interval_minutes  = 30
+
+; Clean when idle 5+ minutes
+on_idle_minutes   = 5
+
+; Clean once 60s after launch
+on_boot_delay     = 60
+
+; Show balloon notifications
+silent_mode       = 0
+
+; Enable auto-cleaning
+auto_clean        = 1
+
+[App]
+; Launch at Windows startup
+start_with_windows = 0</code></pre>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<div class="divider"></div>
+
+<!-- ── COMPARE ── -->
+<section id="compare">
+  <div class="container">
+    <span class="section-label">Comparison</span>
+    <h2 class="section-title">The lightest tool<br/>that actually works.</h2>
+    <div class="glow-sep"></div>
+
+    <div class="fade-in" style="overflow-x:auto;border-radius:var(--radius-lg);border:1px solid var(--border);">
+      <table class="compare-table">
+        <thead>
+          <tr style="background:var(--bg-card);">
+            <th>Tool</th>
+            <th>Binary Size</th>
+            <th>Standby Purge</th>
+            <th>Auto-clean</th>
+            <th>No Ads</th>
+            <th>Open Source</th>
+            <th>Hotkey</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr class="ours">
+            <td>RAMKeeper ✦</td>
+            <td><strong style="color:var(--green)">142 KB</strong></td>
+            <td><span class="tick">✓</span></td>
+            <td><span class="tick">✓</span></td>
+            <td><span class="tick">✓</span></td>
+            <td><span class="tick">✓</span></td>
+            <td><span class="tick">✓</span></td>
+          </tr>
+          <tr>
+            <td>Wise Memory Optimizer</td>
+            <td><span style="color:var(--red)">50 MB</span></td>
+            <td><span class="tick">✓</span></td>
+            <td><span class="tick">✓</span></td>
+            <td><span class="cross">✗</span></td>
+            <td><span class="cross">✗</span></td>
+            <td><span class="cross">✗</span></td>
+          </tr>
+          <tr>
+            <td>Mem Reduct</td>
+            <td>1.5 MB</td>
+            <td><span class="tick">✓</span></td>
+            <td><span class="tick">✓</span></td>
+            <td><span class="tick">✓</span></td>
+            <td><span class="cross">✗</span></td>
+            <td><span class="partial">~</span></td>
+          </tr>
+          <tr>
+            <td>RAMMap (Sysinternals)</td>
+            <td>2 MB</td>
+            <td><span class="tick">✓</span></td>
+            <td><span class="cross">✗</span></td>
+            <td><span class="tick">✓</span></td>
+            <td><span class="cross">✗</span></td>
+            <td><span class="cross">✗</span></td>
+          </tr>
+          <tr>
+            <td>Task Manager</td>
+            <td>OS built-in</td>
+            <td><span class="cross">✗</span></td>
+            <td><span class="cross">✗</span></td>
+            <td><span class="tick">✓</span></td>
+            <td><span class="cross">✗</span></td>
+            <td><span class="cross">✗</span></td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+</section>
+
+<div class="divider"></div>
+
+<!-- ── DOWNLOAD CTA ── -->
+<section class="download-section">
+  <div class="container">
+    <h2>Ready to reclaim<br/>your RAM?</h2>
+    <p>Free, open source, and takes 30 seconds to set up.</p>
+
+    <div class="badges">
+      <span class="badge badge-purple">C++ Win32</span>
+      <span class="badge badge-green">142 KB binary</span>
+      <span class="badge badge-pink">MIT License</span>
+      <span class="badge badge-orange">Windows 7+</span>
+    </div>
+
+    <div style="display:flex;gap:1rem;justify-content:center;flex-wrap:wrap;">
+      <a href="https://github.com/ashishpatel26/RAMKeeper/releases/latest" class="btn-primary" style="font-size:1.1rem;padding:16px 32px;">
+        ⬇&nbsp; Download RAMKeeper.exe
+      </a>
+      <a href="https://github.com/ashishpatel26/RAMKeeper" class="btn-ghost" style="font-size:1.1rem;padding:16px 32px;">
+        View Source on GitHub
+      </a>
+    </div>
+  </div>
+</section>
+
+<!-- ── FOOTER ── -->
+<footer>
+  <div class="footer-links">
+    <a href="https://github.com/ashishpatel26/RAMKeeper">GitHub</a>
+    <a href="https://github.com/ashishpatel26/RAMKeeper/releases">Releases</a>
+    <a href="https://github.com/ashishpatel26/RAMKeeper/issues">Issues</a>
+    <a href="https://github.com/ashishpatel26/RAMKeeper/blob/main/LICENSE">MIT License</a>
+    <a href="https://github.com/ashishpatel26/RAMKeeper/blob/main/setup-cpp.md">Build Guide</a>
+  </div>
+  <p>Made with ♥ by <a href="https://github.com/ashishpatel26">Ashish Patel</a> · MIT License · No trackers, no analytics</p>
+</footer>
+
+<!-- Prism.js -->
+<script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/prism.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/components/prism-ini.min.js"></script>
+
+<script>
+  // Scroll fade-in
+  const obs = new IntersectionObserver((entries) => {
+    entries.forEach(e => { if (e.isIntersecting) { e.target.classList.add('visible'); obs.unobserve(e.target); } });
+  }, { threshold: 0.1 });
+  document.querySelectorAll('.fade-in').forEach(el => obs.observe(el));
+
+  // Tab switching
+  function switchTab(btn, id) {
+    document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+    document.querySelectorAll('.tab-content').forEach(t => t.classList.remove('active'));
+    btn.classList.add('active');
+    document.getElementById(id).classList.add('active');
+  }
+
+  // Copy button
+  function copyCode(btn) {
+    const pre = btn.closest('.code-block').querySelector('pre code');
+    navigator.clipboard.writeText(pre.textContent).then(() => {
+      btn.textContent = 'Copied!';
+      setTimeout(() => btn.textContent = 'Copy', 2000);
+    });
+  }
+
+  // Active nav highlight on scroll
+  const sections = document.querySelectorAll('section[id]');
+  const navLinks = document.querySelectorAll('.nav-links a[href^="#"]');
+  window.addEventListener('scroll', () => {
+    let cur = '';
+    sections.forEach(s => { if (window.scrollY >= s.offsetTop - 100) cur = s.id; });
+    navLinks.forEach(a => {
+      a.style.color = a.getAttribute('href') === '#' + cur ? 'var(--text)' : '';
+    });
+  }, { passive: true });
+</script>
+</body>
+</html>
