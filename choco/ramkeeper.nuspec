@@ -1,0 +1,39 @@
+<?xml version="1.0" encoding="utf-8"?>
+<package xmlns="http://schemas.microsoft.com/packaging/2015/06/nuspec.xsd">
+  <metadata>
+    <id>ramkeeper</id>
+    <version>1.0.0</version>
+    <packageSourceUrl>https://github.com/ashishpatel26/RAMKeeper</packageSourceUrl>
+    <owners>ashishpatel26</owners>
+    <title>RAMKeeper</title>
+    <authors>Ashish Patel</authors>
+    <projectUrl>https://github.com/ashishpatel26/RAMKeeper</projectUrl>
+    <licenseUrl>https://github.com/ashishpatel26/RAMKeeper/blob/main/LICENSE</licenseUrl>
+    <requireLicenseAcceptance>false</requireLicenseAcceptance>
+    <projectSourceUrl>https://github.com/ashishpatel26/RAMKeeper</projectSourceUrl>
+    <bugTrackerUrl>https://github.com/ashishpatel26/RAMKeeper/issues</bugTrackerUrl>
+    <tags>ram memory cleaner optimizer tray windows admin</tags>
+    <summary>Lightweight Windows RAM cleaner — 142KB static binary with system tray, hotkey, and auto-clean support.</summary>
+    <description>RAMKeeper is a lightweight (142KB) portable Windows RAM cleaner that purges the standby/cached memory list via NtSetSystemInformation, immediately reclaiming memory without rebooting.
+
+## Features
+
+- **System tray app** — runs quietly in the background
+- **Global hotkey** — Ctrl+Alt+R triggers an instant purge from anywhere
+- **Auto-clean modes** — threshold-based (purge when free RAM drops below N%), interval-based (purge every N minutes), and idle-based (purge after N minutes of inactivity)
+- **No runtime dependencies** — single static binary, no .NET, no MSVC redistributable
+- **No ads, no telemetry** — MIT licensed, open source
+
+## Notes
+
+RAMKeeper requires administrator privileges because the standby memory purge needs SeProfileSingleProcessPrivilege.
+
+This is a portable executable. Chocolatey installs it to the tools directory and creates a shim so `RAMKeeper` is available from any terminal.
+    </description>
+    <releaseNotes>https://github.com/ashishpatel26/RAMKeeper/releases/tag/v1.0.0</releaseNotes>
+    <copyright>Copyright (c) 2026 Ashish Patel</copyright>
+  </metadata>
+  <files>
+    <file src="tools\**" target="tools" />
+  </files>
+</package>
