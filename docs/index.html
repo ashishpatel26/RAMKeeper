@@ -769,9 +769,12 @@
           <span>PowerShell</span>
         </div>
         <div class="terminal-body">
-          <span class="comment"># 1. Download the latest release</span>
-          <br><span class="prompt">PS&gt;</span> <span class="cmd">Invoke-WebRequest https://github.com/ashishpatel26/RAMKeeper/releases/latest/download/RAMKeeper.exe -OutFile RAMKeeper.exe</span>
-          <br><br><span class="comment"># 2. Run as Administrator (required for standby purge)</span>
+          <span class="comment"># 1. Download ZIP (avoids SmartScreen block)</span>
+          <br><span class="prompt">PS&gt;</span> <span class="cmd">Invoke-WebRequest https://github.com/ashishpatel26/RAMKeeper/releases/latest/download/RAMKeeper.zip -OutFile RAMKeeper.zip</span>
+          <br><span class="prompt">PS&gt;</span> <span class="cmd">Expand-Archive RAMKeeper.zip -DestinationPath . -Force</span>
+          <br><br><span class="comment"># 2. Unblock (removes Mark of the Web)</span>
+          <br><span class="prompt">PS&gt;</span> <span class="cmd">Unblock-File .\RAMKeeper.exe</span>
+          <br><br><span class="comment"># 3. Run as Administrator (required for standby purge)</span>
           <br><span class="prompt">PS&gt;</span> <span class="cmd">Start-Process RAMKeeper.exe -Verb RunAs</span>
           <br><br><span class="out ok">✓ Tray icon appears in system tray. Right-click for menu.</span>
         </div>
@@ -984,13 +987,25 @@ start_with_windows = 0</code></pre>
       <span class="badge badge-orange">Windows 7+</span>
     </div>
 
-    <div style="display:flex;gap:1rem;justify-content:center;flex-wrap:wrap;">
-      <a href="https://github.com/ashishpatel26/RAMKeeper/releases/latest" class="btn-primary" style="font-size:1.1rem;padding:16px 32px;">
-        ⬇&nbsp; Download RAMKeeper.exe
+    <div style="display:flex;gap:1rem;justify-content:center;flex-wrap:wrap;margin-bottom:1.5rem;">
+      <a href="https://github.com/ashishpatel26/RAMKeeper/releases/latest/download/RAMKeeper.zip" class="btn-primary" style="font-size:1.1rem;padding:16px 32px;">
+        ⬇&nbsp; Download ZIP (recommended)
+      </a>
+      <a href="https://github.com/ashishpatel26/RAMKeeper/releases/latest/download/RAMKeeper.exe" class="btn-ghost" style="font-size:1.1rem;padding:16px 32px;">
+        ⬇&nbsp; Direct EXE
       </a>
       <a href="https://github.com/ashishpatel26/RAMKeeper" class="btn-ghost" style="font-size:1.1rem;padding:16px 32px;">
-        View Source on GitHub
+        ⭐&nbsp; View Source
       </a>
+    </div>
+
+    <div style="background:rgba(251,191,36,0.08);border:1px solid rgba(251,191,36,0.25);border-radius:12px;padding:1.25rem 1.5rem;max-width:560px;margin:0 auto;text-align:left;">
+      <p style="font-size:0.875rem;color:#fde68a;font-weight:600;margin-bottom:0.5rem;">⚠ Windows SmartScreen Warning</p>
+      <p style="font-size:0.82rem;color:var(--text-muted);line-height:1.7;margin:0;">
+        Because RAMKeeper is not yet code-signed, Windows or your browser may flag it.<br/>
+        <strong style="color:var(--text)">Recommended:</strong> Download the ZIP, extract, right-click <code style="font-family:JetBrains Mono,monospace;font-size:0.78rem;background:rgba(255,255,255,0.06);padding:1px 5px;border-radius:3px;">RAMKeeper.exe</code> → <strong>Properties</strong> → check <strong>Unblock</strong> → OK → Run as Administrator.<br/>
+        Or in PowerShell: <code style="font-family:JetBrains Mono,monospace;font-size:0.78rem;background:rgba(255,255,255,0.06);padding:1px 5px;border-radius:3px;">Unblock-File .\RAMKeeper.exe</code>
+      </p>
     </div>
   </div>
 </section>

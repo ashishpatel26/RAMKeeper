@@ -43,18 +43,26 @@ jobs:
           for %%F in (build\RAMKeeper.exe) do echo Size: %%~zF bytes
           dumpbin /dependents build\RAMKeeper.exe
 
+      - name: Package ZIP
+        shell: pwsh
+        run: Compress-Archive -Path build\RAMKeeper.exe -DestinationPath build\RAMKeeper.zip -Force
+
       - name: Upload artifact (for non-tag builds)
         uses: actions/upload-artifact@v4
         with:
           name: RAMKeeper
-          path: build\RAMKeeper.exe
+          path: |
+            build\RAMKeeper.exe
+            build\RAMKeeper.zip
           if-no-files-found: error
 
       - name: Create GitHub Release (tag builds only)
         if: startsWith(github.ref, 'refs/tags/')
         uses: softprops/action-gh-release@v2
         with:
-          files: build\RAMKeeper.exe
+          files: |
+            build\RAMKeeper.exe
+            build\RAMKeeper.zip
           name: "RAMKeeper ${{ github.ref_name }}"
           body: |
             ## RAMKeeper ${{ github.ref_name }}
