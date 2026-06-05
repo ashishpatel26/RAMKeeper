@@ -1,0 +1,8 @@
+// Resource script
+#include <windows.h>
+
+// Application icon (IDI_APPICON = 1)
+1 ICON "icon.ico"
+
+// Embed manifest so UAC prompt triggers correctly
+1 RT_MANIFEST "app.manifest"
