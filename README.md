@@ -1,3 +1,21 @@
+<p align="center">
+  <img src="res/logo.png" alt="RAMKeeper" width="400"/>
+</p>
+
+<p align="center">
+  <strong>Lightweight Windows RAM Cleaner</strong><br/>
+  142 KB · No runtime dependencies · No ads · Open source
+</p>
+
+<p align="center">
+  <img src="https://img.shields.io/badge/platform-Windows-blue?logo=windows" alt="Windows"/>
+  <img src="https://img.shields.io/badge/size-142_KB-brightgreen" alt="Size"/>
+  <img src="https://img.shields.io/badge/license-MIT-green" alt="MIT"/>
+  <img src="https://img.shields.io/badge/language-C%2B%2B17-orange?logo=cplusplus" alt="C++17"/>
+</p>
+
+---
+
 # RAMKeeper
 
 Lightweight Windows RAM cleaner — **142 KB**, no runtime dependencies, no ads.
