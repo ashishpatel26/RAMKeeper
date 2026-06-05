@@ -3,15 +3,15 @@ Verification is intended to assist the Chocolatey moderators and community
 in verifying that this package's contents are trustworthy.
 
 Package name: ramkeeper
-Version:      1.0.0
+Version:      1.0.2
 
 The binary included in (or downloaded by) this package can be verified as follows:
 
 1. Go to the official GitHub release page:
-   https://github.com/ashishpatel26/RAMKeeper/releases/tag/v1.0.0
+   https://github.com/ashishpatel26/RAMKeeper/releases/tag/v1.0.2
 
 2. Download the file directly from the release:
-   URL: https://github.com/ashishpatel26/RAMKeeper/releases/download/v1.0.0/RAMKeeper.exe
+   URL: https://github.com/ashishpatel26/RAMKeeper/releases/download/v1.0.2/RAMKeeper.exe
 
 3. Compute the SHA-256 hash of the downloaded file and compare it to the
    checksum declared in tools\chocolateyInstall.ps1:
@@ -19,13 +19,10 @@ The binary included in (or downloaded by) this package can be verified as follow
    PowerShell command:
      (Get-FileHash -Algorithm SHA256 "RAMKeeper.exe").Hash
 
-   Expected SHA-256: 1DDA51E9A7A29BF7C1F4D41619B8CB3F7F173A96EC1FB236A4019839E33791A7
-   (Replace this placeholder with the actual hash before submitting to the
-    Chocolatey community repository.)
+   Expected SHA-256: (see chocolateyInstall.ps1 — update after v1.0.2 CI build)
 
 File: RAMKeeper.exe
 Algorithm: SHA256
-Checksum: 1DDA51E9A7A29BF7C1F4D41619B8CB3F7F173A96EC1FB236A4019839E33791A7
 
 Note: The download URL above points to GitHub Releases, which is the
 official, authoritative source for this binary. The project is MIT

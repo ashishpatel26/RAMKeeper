@@ -4,12 +4,12 @@
 
 <p align="center">
   <strong>Lightweight Windows RAM Cleaner</strong><br/>
-  142 KB · No runtime dependencies · No ads · Open source
+  149 KB · No runtime dependencies · No ads · Open source
 </p>
 
 <p align="center">
   <img src="https://img.shields.io/badge/platform-Windows-blue?logo=windows" alt="Windows"/>
-  <img src="https://img.shields.io/badge/size-142_KB-brightgreen" alt="Size"/>
+  <img src="https://img.shields.io/badge/size-149_KB-brightgreen" alt="Size"/>
   <img src="https://img.shields.io/badge/license-MIT-green" alt="MIT"/>
   <img src="https://img.shields.io/badge/language-C%2B%2B17-orange?logo=cplusplus" alt="C++17"/>
 </p>
@@ -18,7 +18,7 @@
 
 # RAMKeeper
 
-Lightweight Windows RAM cleaner — **142 KB**, no runtime dependencies, no ads.
+Lightweight Windows RAM cleaner — **149 KB**, no runtime dependencies, no ads.
 
 Purges the Windows standby/cached memory list that Task Manager can't touch. Runs silently in the system tray.
 
@@ -147,7 +147,7 @@ Steps 2-4 require administrator privileges.
 
 | | RAMKeeper | Wise Memory Optimizer | Mem Reduct |
 |---|---|---|---|
-| Size | **142 KB** | 50 MB | 1.5 MB |
+| Size | **149 KB** | 50 MB | 1.5 MB |
 | No ads | ✅ | ❌ | ✅ |
 | Open source | ✅ | ❌ | ❌ |
 | Tray-only UI | ✅ | ❌ | ⚠ |
