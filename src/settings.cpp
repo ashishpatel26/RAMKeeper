@@ -173,7 +173,10 @@ static LRESULT CALLBACK SettingsProc(HWND hwnd, UINT msg, WPARAM wp, LPARAM lp) 
         return 0;
 
     case WM_DESTROY:
-        PostQuitMessage(0); // unblock the nested message loop
+        // Post WM_NULL to wake GetMessageW in the nested loop — do NOT use
+        // PostQuitMessage here: that leaves WM_QUIT in the queue and the
+        // outer WinMain loop picks it up, silently exiting the app.
+        PostThreadMessageW(GetCurrentThreadId(), WM_NULL, 0, 0);
         return 0;
     }
     return DefWindowProcW(hwnd, msg, wp, lp);
@@ -220,7 +223,7 @@ bool Settings_Show(HWND parent, AppConfig& cfg) {
     if (parent && IsWindowVisible(parent))
         EnableWindow(parent, FALSE);
 
-    // Nested message loop — blocks until DestroyWindow posts WM_QUIT
+    // Nested message loop — exits when hwnd is destroyed (WM_NULL wakes it)
     MSG msg{};
     while (GetMessageW(&msg, nullptr, 0, 0) > 0) {
         if (!IsWindow(hwnd)) break;
@@ -229,6 +232,8 @@ bool Settings_Show(HWND parent, AppConfig& cfg) {
             DispatchMessageW(&msg);
         }
     }
+    // If WM_QUIT arrived in our loop, re-post so outer WinMain loop also exits
+    if (msg.message == WM_QUIT) PostQuitMessage(static_cast<int>(msg.wParam));
 
     if (parent && IsWindowVisible(parent))
         EnableWindow(parent, TRUE);
