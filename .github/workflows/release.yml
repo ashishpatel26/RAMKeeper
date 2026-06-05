@@ -37,10 +37,10 @@ jobs:
           cmake --build build --config Release
 
       - name: Show binary info
-        shell: pwsh
+        shell: cmd
         run: |
-          $f = Get-Item "build\RAMKeeper.exe"
-          Write-Host "Size: $([math]::Round($f.Length/1KB,1)) KB"
+          call "C:\Program Files\Microsoft Visual Studio\2022\Enterprise\VC\Auxiliary\Build\vcvars64.bat"
+          for %%F in (build\RAMKeeper.exe) do echo Size: %%~zF bytes
           dumpbin /dependents build\RAMKeeper.exe
 
       - name: Upload artifact (for non-tag builds)
