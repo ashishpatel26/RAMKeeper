@@ -1,0 +1,26 @@
+# yaml-language-server: $schema=https://aka.ms/winget-manifest.defaultLocale.1.6.0.schema.json
+PackageIdentifier: ashishpatel26.RAMKeeper
+PackageVersion: 1.0.3
+PackageLocale: en-US
+Publisher: Ashish Patel
+PublisherUrl: https://github.com/ashishpatel26
+PublisherSupportUrl: https://github.com/ashishpatel26/RAMKeeper/issues
+PackageName: RAMKeeper
+PackageUrl: https://github.com/ashishpatel26/RAMKeeper
+License: MIT
+LicenseUrl: https://github.com/ashishpatel26/RAMKeeper/blob/main/LICENSE
+ShortDescription: Lightweight Windows RAM cleaner — 149KB static binary, purges standby list, no runtime deps
+Description: |-
+  RAMKeeper is a lightweight Windows RAM cleaner that purges the standby list to free up memory.
+  It ships as a single 149KB static binary with no runtime dependencies. The app runs in the
+  system tray with Settings dialog, Ctrl+Alt+R hotkey, auto-clean triggers, and persistent config.
+Moniker: ramkeeper
+Tags:
+  - ram
+  - memory
+  - cleaner
+  - optimizer
+  - tray
+  - windows
+ManifestType: defaultLocale
+ManifestVersion: 1.6.0

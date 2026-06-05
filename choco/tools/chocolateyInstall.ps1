@@ -7,9 +7,9 @@ $installDir  = "$(Get-ToolsLocation)\RAMKeeper"
 $packageArgs = @{
   packageName    = $packageName
   fileType       = 'exe'
-  url            = 'https://github.com/ashishpatel26/RAMKeeper/releases/download/v1.0.2/RAMKeeper.exe'
+  url            = 'https://github.com/ashishpatel26/RAMKeeper/releases/download/v1.0.3/RAMKeeper.exe'
 
-  # SHA-256 of RAMKeeper.exe from v1.0.2 release
+  # SHA-256 of RAMKeeper.exe from v1.0.3 release
   # Update after CI build: (Get-FileHash -Algorithm SHA256 "RAMKeeper.exe").Hash
   checksum       = 'REPLACE_WITH_V1.0.2_SHA256'
   checksumType   = 'sha256'
