@@ -3,11 +3,12 @@ name: Build & Release
 on:
   push:
     tags:
-      - "v*"          # triggers on v1.0.0, v1.2.3, etc.
-  workflow_dispatch:  # manual trigger from GitHub UI
+      - "v*"
+  workflow_dispatch:
 
 permissions:
-  contents: write   # needed to create releases and upload assets
+  contents: write
+  id-token: write  # required by SignPath
 
 jobs:
   build:
@@ -43,11 +44,50 @@ jobs:
           for %%F in (build\RAMKeeper.exe) do echo Size: %%~zF bytes
           dumpbin /dependents build\RAMKeeper.exe
 
-      - name: Package ZIP
+      # Upload unsigned EXE so SignPath can fetch it
+      - name: Upload unsigned artifact
+        id: upload-unsigned
+        uses: actions/upload-artifact@v4
+        with:
+          name: RAMKeeper-unsigned
+          path: build\RAMKeeper.exe
+          if-no-files-found: error
+
+      # ── CODE SIGNING via SignPath.io (free OSS program) ──────────────────
+      # Setup: https://signpath.io/open-source-software-program
+      # Add these GitHub Secrets:
+      #   SIGNPATH_API_TOKEN       — from SignPath dashboard → CI User API token
+      #   SIGNPATH_ORGANIZATION_ID — from SignPath dashboard → Settings → General
+      - name: Sign EXE (SignPath.io)
+        if: startsWith(github.ref, 'refs/tags/')
+        uses: signpath/github-action-submit-signing-request@v1
+        with:
+          api-token:                  '${{ secrets.SIGNPATH_API_TOKEN }}'
+          organization-id:            '${{ secrets.SIGNPATH_ORGANIZATION_ID }}'
+          project-slug:               'RAMKeeper'
+          signing-policy-slug:        'release-signing'
+          artifact-configuration-slug: 'exe-signing'
+          github-artifact-id:         '${{ steps.upload-unsigned.outputs.artifact-id }}'
+          wait-for-completion:        true
+          output-artifact-directory:  'signed'
+
+      # Replace unsigned EXE with signed one (tag builds only)
+      - name: Use signed EXE
+        if: startsWith(github.ref, 'refs/tags/')
+        shell: pwsh
+        run: |
+          if (Test-Path "signed\RAMKeeper.exe") {
+            Copy-Item "signed\RAMKeeper.exe" "build\RAMKeeper.exe" -Force
+            Write-Host "Using signed EXE"
+          } else {
+            Write-Host "::warning::Signed artifact not found — using unsigned EXE"
+          }
+
+      - name: Package ZIP (signed EXE inside)
         shell: pwsh
         run: Compress-Archive -Path build\RAMKeeper.exe -DestinationPath build\RAMKeeper.zip -Force
 
-      - name: Upload artifact (for non-tag builds)
+      - name: Upload final artifact
         uses: actions/upload-artifact@v4
         with:
           name: RAMKeeper
@@ -68,14 +108,23 @@ jobs:
             ## RAMKeeper ${{ github.ref_name }}
 
             ### Download
-            **[RAMKeeper.exe](https://github.com/${{ github.repository }}/releases/download/${{ github.ref_name }}/RAMKeeper.exe)** — lightweight Windows RAM cleaner.
+            **[RAMKeeper.zip](https://github.com/${{ github.repository }}/releases/download/${{ github.ref_name }}/RAMKeeper.zip)** — extract and run (recommended)
+            **[RAMKeeper.exe](https://github.com/${{ github.repository }}/releases/download/${{ github.ref_name }}/RAMKeeper.exe)** — direct download (code-signed)
 
             Run as **Administrator** → tray icon appears → right-click for menu.
 
+            ### Code Signing
+            This release is code-signed by the [SignPath Foundation](https://signpath.org), a non-profit organization that provides free code signing for open-source software.
+
+            ### If Windows blocks the download
+            ```powershell
+            Unblock-File .\RAMKeeper.exe
+            ```
+
             ### Requirements
             - Windows 7+ (x64)
-            - Administrator privileges
-            - No runtime dependencies
+            - Administrator privileges (for standby list purge)
+            - No runtime dependencies — static binary
 
             ### Hotkey
             `Ctrl+Alt+R` — clean RAM instantly from anywhere.
