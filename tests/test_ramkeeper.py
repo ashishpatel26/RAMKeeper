@@ -11,8 +11,36 @@ import pytest
 from pywinauto import Desktop
 from pywinauto.keyboard import send_keys
 
+import ctypes
+import ctypes.wintypes
+
 EXE = os.path.join(os.path.dirname(__file__), "..", "build", "RAMKeeper.exe")
 EXE = os.path.abspath(EXE)
+
+# RAMKeeper uses HWND_MESSAGE parent — not enumerated by FindWindowW.
+# FindWindowExW(HWND_MESSAGE, NULL, ...) searches the message-only hierarchy.
+_HWND_MESSAGE = ctypes.cast(-3, ctypes.wintypes.HWND)
+
+
+def _find_hwnd():
+    """Find RAMKeeper's message-only HWND."""
+    return ctypes.windll.user32.FindWindowExW(
+        _HWND_MESSAGE, None, "RAMKeeper", "RAMKeeper"
+    )
+
+
+def _post_cmd(cmd_id):
+    """Post WM_COMMAND to RAMKeeper HWND. Returns hwnd (0 = not found)."""
+    hwnd = _find_hwnd()
+    if hwnd:
+        ctypes.windll.user32.PostMessageW(hwnd, 0x0111, cmd_id, 0)
+    return hwnd
+
+
+IDM_CLEAN_NOW = 100
+IDM_SETTINGS = 102
+IDM_EXIT = 103
+IDM_STATUS = 104
 
 
 def find_tray_notify_icon():
@@ -102,26 +130,9 @@ def test_hotkey_does_not_crash(app):
 
 # ── 4. Settings dialog ───────────────────────────────────────────────────────
 
-def _open_settings_via_menu():
-    """
-    Post WM_COMMAND for IDM_SETTINGS (102) directly — avoids brittle tray
-    right-click simulation which requires exact icon coordinates.
-    """
-    # ponytail: SendMessage approach; real tray click needs coords from
-    # Shell_NotifyIconGetRect (Vista+), add when testing click paths matters.
-    import ctypes
-    WM_COMMAND = 0x0111
-    IDM_SETTINGS = 102
-
-    hwnd = ctypes.windll.user32.FindWindowW("RAMKeeper", "RAMKeeper")
-    if hwnd:
-        ctypes.windll.user32.PostMessageW(hwnd, WM_COMMAND, IDM_SETTINGS, 0)
-    return hwnd != 0
-
-
 def test_settings_dialog_opens(app):
     """Settings dialog appears with expected title."""
-    assert _open_settings_via_menu(), "RAMKeeper HWND not found"
+    assert _post_cmd(IDM_SETTINGS), "RAMKeeper HWND not found"
     time.sleep(1)
     desktop = Desktop(backend="win32")
     dlg = desktop.window(title="RAMKeeper — Settings")
@@ -130,7 +141,7 @@ def test_settings_dialog_opens(app):
 
 def test_settings_dialog_has_threshold_field(app):
     """Threshold edit control exists in settings."""
-    _open_settings_via_menu()
+    _post_cmd(IDM_SETTINGS)
     time.sleep(1)
     desktop = Desktop(backend="win32")
     dlg = desktop.window(title="RAMKeeper — Settings")
@@ -144,7 +155,7 @@ def test_settings_dialog_has_threshold_field(app):
 
 def test_settings_cancel_keeps_app_alive(app):
     """Cancelling settings does not exit the app."""
-    _open_settings_via_menu()
+    _post_cmd(IDM_SETTINGS)
     time.sleep(1)
     desktop = Desktop(backend="win32")
     dlg = desktop.window(title="RAMKeeper — Settings")
@@ -161,19 +172,9 @@ def test_settings_cancel_keeps_app_alive(app):
 
 # ── 5. Status window ─────────────────────────────────────────────────────────
 
-def _open_status():
-    import ctypes
-    WM_COMMAND = 0x0111
-    IDM_STATUS = 104
-    hwnd = ctypes.windll.user32.FindWindowW("RAMKeeper", "RAMKeeper")
-    if hwnd:
-        ctypes.windll.user32.PostMessageW(hwnd, WM_COMMAND, IDM_STATUS, 0)
-    return hwnd != 0
-
-
 def test_status_window_opens(app):
     """Status window appears with title RAMKeeper."""
-    assert _open_status(), "RAMKeeper HWND not found"
+    assert _post_cmd(IDM_STATUS), "RAMKeeper HWND not found"
     time.sleep(1)
     desktop = Desktop(backend="win32")
     sw = desktop.window(class_name="RAMKeeperStatus")
@@ -182,7 +183,7 @@ def test_status_window_opens(app):
 
 def test_status_window_closes_on_escape(app):
     """ESC closes the status window."""
-    _open_status()
+    _post_cmd(IDM_STATUS)
     time.sleep(1)
     desktop = Desktop(backend="win32")
     sw = desktop.window(class_name="RAMKeeperStatus")
@@ -196,13 +197,8 @@ def test_status_window_closes_on_escape(app):
 # ── 6. Clean via WM_COMMAND ──────────────────────────────────────────────────
 
 def test_clean_now_does_not_crash(app):
-    """IDM_CLEAN_NOW (100) fires without killing the process."""
-    import ctypes
-    WM_COMMAND = 0x0111
-    IDM_CLEAN_NOW = 100
-    hwnd = ctypes.windll.user32.FindWindowW("RAMKeeper", "RAMKeeper")
-    assert hwnd, "RAMKeeper HWND not found"
-    ctypes.windll.user32.PostMessageW(hwnd, WM_COMMAND, IDM_CLEAN_NOW, 0)
+    """IDM_CLEAN_NOW fires without killing the process."""
+    assert _post_cmd(IDM_CLEAN_NOW), "RAMKeeper HWND not found"
     time.sleep(4)  # clean takes ~2-3s
     procs = subprocess.run(
         ["tasklist", "/FI", "IMAGENAME eq RAMKeeper.exe"],
@@ -214,13 +210,8 @@ def test_clean_now_does_not_crash(app):
 # ── 7. Graceful exit ─────────────────────────────────────────────────────────
 
 def test_exit_via_menu(app):
-    """IDM_EXIT (103) terminates the process cleanly."""
-    import ctypes
-    WM_COMMAND = 0x0111
-    IDM_EXIT = 103
-    hwnd = ctypes.windll.user32.FindWindowW("RAMKeeper", "RAMKeeper")
-    assert hwnd
-    ctypes.windll.user32.PostMessageW(hwnd, WM_COMMAND, IDM_EXIT, 0)
+    """IDM_EXIT terminates the process cleanly."""
+    assert _post_cmd(IDM_EXIT), "RAMKeeper HWND not found"
     time.sleep(1)
     procs = subprocess.run(
         ["tasklist", "/FI", "IMAGENAME eq RAMKeeper.exe"],
