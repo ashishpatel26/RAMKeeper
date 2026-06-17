@@ -1,7 +1,6 @@
 $ErrorActionPreference = 'Stop'
 
 $packageName = 'ramkeeper'
-$toolsDir    = "$(Split-Path -parent $MyInvocation.MyCommand.Definition)"
 $installDir  = "$(Get-ToolsLocation)\RAMKeeper"
 
 $packageArgs = @{
@@ -11,7 +10,7 @@ $packageArgs = @{
 
   # SHA-256 computed from CI-built release asset
   # (Get-FileHash -Algorithm SHA256 "RAMKeeper.exe").Hash
-  checksum       = 'REPLACE_WITH_V1.1.0_SHA256'
+  checksum       = '1c410ba742c4b109031a31bf303a26a8f93123f37e1ab3b2546f2807a30ab680'
   checksumType   = 'sha256'
 
   # Destination path for the portable exe

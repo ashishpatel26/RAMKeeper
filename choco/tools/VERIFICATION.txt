@@ -19,7 +19,7 @@ The binary included in (or downloaded by) this package can be verified as follow
    PowerShell command:
      (Get-FileHash -Algorithm SHA256 "RAMKeeper.exe").Hash
 
-   Expected SHA-256: (see chocolateyInstall.ps1 — update after v1.1.0 CI build)
+   Expected SHA-256: 1c410ba742c4b109031a31bf303a26a8f93123f37e1ab3b2546f2807a30ab680
 
 File: RAMKeeper.exe
 Algorithm: SHA256
