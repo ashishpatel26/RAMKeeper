@@ -194,29 +194,68 @@ include/          — matching header for each module
 
 ---
 
+## Product Vision
+
+> Designed thinking like a product team building a world-class OS utility — the memory manager Windows forgot to ship.
+
+**Core thesis:** Task Manager shows the problem. Nothing fixes it intelligently. RAMKeeper becomes the proactive memory layer that makes your PC *always ready* — not just reactive.
+
+### Three Pillars
+
+| Pillar | Meaning |
+|--------|---------|
+| **Invisible Intelligence** | Runs silently, learns patterns, cleans before you need it |
+| **Radical Transparency** | When you look, you see exactly what happened, why, and what was saved |
+| **Power User First** | CLI, JSON output, webhooks — developers trust it because they can control it |
+
+### The Killer Differentiator
+
+Every other tool cleans on a dumb threshold. RAMKeeper knows *what you're about to do* and cleans *before* you need it:
+
+> Game launches → RAM freed → zero stutter on load
+> Teams call starts → RAM freed → no lag on first screen share
+> Build starts → RAM freed → compiler gets full memory
+
+---
+
 ## Future Roadmap
 
 > Items marked ~~strikethrough~~ shipped in v1.1.0.
 
-### 🔜 Short-term (next release)
+### 🔜 V1.2 — "Smart Context" (next release)
 
-- **Signed binary** — SignPath pipeline wired but not completing; removing SmartScreen friction is the highest user-facing blocker
-- **UAC re-launch with `runas`** — current approach shows one-time balloon; full fix is `ShellExecute` re-launch with `runas` verb to get an elevated token. Non-trivial: single-instance mutex, tray icon, and config state all need handling across the process restart
-- **64-bit + ARM64 builds** — CI change only; ARM64 EC covers Surface Pro X and Copilot+ PCs
+- **Signed binary** — SignPath pipeline wired; removing SmartScreen friction is highest user-facing blocker
+- **UAC re-launch with `runas`** — full fix is `ShellExecute` re-launch with `runas` verb; non-trivial across mutex + tray + config state
+- **64-bit + ARM64 builds** — CI change only; covers Surface Pro X and Copilot+ PCs
+- **CLI flags** — `RAMKeeper.exe /clean /status /exit` — scriptable from Task Scheduler, PowerShell, CI
+- **Context-aware cleaning** — detect game launch (process name watch) → pre-clean before game window appears
+- **Meeting Mode** — detect Teams/Zoom starting → auto-clean + silence notifications during call
+- **Before/after popup** — "Freed 1.4 GB" balloon showing standby reclaimed vs working set trimmed
+- **Live RAM % on tray icon** — number drawn on icon, not just color dot
+- **Bigger UI** — settings + status windows resized; more breathing room, better layout
 
-### 🗓️ Mid-term (3–6 months)
+### 🗓️ V1.3 — "Power User" (2–4 weeks after V1.2)
 
-- **Memory history export** — ring buffer exists; add CSV/JSON export from status window or a copy-to-clipboard button
-- **Scheduled clean UI polish** — current Settings fields are two separate int edits; a time picker (HH:MM) would be more intuitive
-- **Tray tooltip: last-clean time** — show when the last clean ran in the tooltip alongside GB usage
-- **Per-clean log viewer** — status window shows last 5 in-memory; a "View log…" button opening the `.log` file in Notepad would close the loop
+- **JSON status output** — `RAMKeeper.exe /status --json` → pipe to scripts, dashboards, monitoring
+- **Browser memory guard** — detect Chrome/Edge > 2 GB → offer working-set trim or tab-suspension prompt
+- **Process watchlist** — flag top 5 memory hogs in status window with one-click trim per process
+- **Webhook on clean** — HTTP POST to configured URL after each clean (Home Assistant, Zapier, Grafana)
+- **Week-in-review tooltip** — tray tooltip shows "Freed 24 GB this week, 3.1 GB saved today"
+- **Memory history export** — CSV/JSON export from status window; copy-to-clipboard button
+- **Per-clean log viewer** — "View log…" button in status window opens `clean.log` in Notepad
+- **Scheduled clean UI polish** — HH:MM time picker instead of two separate int edits
 
-### 🚀 Long-term (6+ months)
+### 🚀 V2.0 — "Platform" (1–2 months)
 
-- **Multiple clean profiles** — single `AppConfig` struct; profile switching ("Gaming" vs "Work") requires profile selector in Settings + named INI sections
-- **Notification customization** — custom sound, toast-style notification, suppression window
-- **Localization** — all strings are hardcoded `L"..."` literals; extract to `.rc STRINGTABLE` for translations
-- **Installer (MSI/NSIS)** — bare EXE/ZIP distribution; proper installer handles elevation, Start Menu shortcut, uninstall entry
+- **Windows 11 Widget** — live RAM sparkline on desktop, one-click clean, no app open needed
+- **Smart scheduling** — learn usage patterns ("you game at 9 pm, pre-clean at 8:55 pm every day")
+- **Multi-machine config sync** — settings sync via GitHub Gist or OneDrive
+- **RAMKeeper CLI** (`ramkeeper.exe` on PATH) — first-class terminal citizen
+- **Multiple clean profiles** — "Gaming", "Work", "Build" presets with profile switcher in Settings
+- **Notification customization** — toast-style (WinRT), custom sound, suppression window
+- **PowerToys integration** — open PR to Microsoft PowerToys as an official module
+- **Installer (MSI/NSIS)** — handles elevation, Start Menu shortcut, uninstall entry
+- **Localization** — extract all `L"..."` to `.rc STRINGTABLE` for community translations
 
 ---
 
