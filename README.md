@@ -4,12 +4,12 @@
 
 <p align="center">
   <strong>Lightweight Windows RAM Cleaner</strong><br/>
-  149 KB · No runtime dependencies · No ads · Open source
+  163 KB · No runtime dependencies · No ads · Open source
 </p>
 
 <p align="center">
   <img src="https://img.shields.io/badge/platform-Windows-blue?logo=windows" alt="Windows"/>
-  <img src="https://img.shields.io/badge/size-149_KB-brightgreen" alt="Size"/>
+  <img src="https://img.shields.io/badge/size-163_KB-brightgreen" alt="Size"/>
   <img src="https://img.shields.io/badge/license-MIT-green" alt="MIT"/>
   <img src="https://img.shields.io/badge/language-C%2B%2B17-orange?logo=cplusplus" alt="C++17"/>
 </p>
@@ -18,7 +18,7 @@
 
 # RAMKeeper
 
-Lightweight Windows RAM cleaner — **149 KB**, no runtime dependencies, no ads.
+Lightweight Windows RAM cleaner — **163 KB**, no runtime dependencies, no ads.
 
 Purges the Windows standby/cached memory list that Task Manager can't touch. Runs silently in the system tray.
 
@@ -28,9 +28,13 @@ Purges the Windows standby/cached memory list that Task Manager can't touch. Run
 
 - Tray-only (no taskbar button, no bloat)
 - **Clean Now** — hotkey `Ctrl+Alt+R` or double-click tray icon
-- Auto-clean when RAM exceeds threshold (default 80%)
-- Interval clean, idle-triggered clean, boot-delay clean
-- Balloon notifications (optional, silenceable)
+- Auto-clean when RAM exceeds threshold, on interval, on idle, or at boot
+- **Status window** — left-click tray: color-coded RAM %, 5-min sparkline, clean history
+- **Color-coded tray icon** — green / yellow / red by RAM usage
+- Balloon notifications (configurable MB threshold, silenceable)
+- **Process exclusion** — skip specific exe names from working-set trim
+- **Scheduled clean** — daily at a configured hour:minute
+- Per-clean log at `%APPDATA%\RAMKeeper\clean.log`
 - Single `.exe` — portable, no installer required
 - Open source, MIT licensed
 
@@ -73,7 +77,9 @@ Task Scheduler → Create Task
 | Action | How |
 |---|---|
 | Clean RAM now | `Ctrl+Alt+R` or double-click tray icon |
+| Open status window | Left-click tray icon |
 | Toggle auto-clean | Right-click tray → Auto-clean |
+| Settings | Right-click tray → Settings |
 | Exit | Right-click tray → Exit |
 
 ### Configuration
@@ -82,12 +88,17 @@ Config file at `%APPDATA%\RAMKeeper\config.ini` (created on first run):
 
 ```ini
 [Clean]
-threshold_percent = 80    ; clean when RAM usage exceeds this %
-interval_minutes  = 30    ; force clean every N minutes (0 = disabled)
-on_idle_minutes   = 5     ; clean when user idle N+ minutes (0 = disabled)
-on_boot_delay     = 60    ; clean once N seconds after launch (0 = disabled)
-silent_mode       = 0     ; 1 = suppress balloon notifications
-auto_clean        = 1     ; 0 = disable all automatic cleaning
+threshold_percent  = 80    ; clean when RAM usage exceeds this %
+interval_minutes   = 30    ; force clean every N minutes (0 = disabled)
+on_idle_minutes    = 5     ; clean when user idle N+ minutes (0 = disabled)
+on_boot_delay      = 60    ; clean once N seconds after launch (0 = disabled)
+silent_mode        = 0     ; 1 = suppress balloon notifications
+auto_clean         = 1     ; 0 = disable all automatic cleaning
+exclude_list       =       ; comma-sep exe names to skip (e.g. game.exe, vm.exe)
+clean_hour         = -1    ; scheduled daily clean hour 0-23 (-1 = disabled)
+clean_minute       = 0     ; scheduled clean minute 0-59
+notify_min_mb      = 10    ; min freed MB to show balloon
+show_status_on_clean = 0   ; 1 = open status window after each clean
 
 [App]
 start_with_windows = 0    ; 1 = add to registry Run key
@@ -147,11 +158,28 @@ Steps 2-4 require administrator privileges.
 
 | | RAMKeeper | Wise Memory Optimizer | Mem Reduct |
 |---|---|---|---|
-| Size | **149 KB** | 50 MB | 1.5 MB |
+| Size | **163 KB** | 50 MB | 1.5 MB |
 | No ads | ✅ | ❌ | ✅ |
 | Open source | ✅ | ❌ | ❌ |
 | Tray-only UI | ✅ | ❌ | ⚠ |
 | Hotkey | ✅ | ❌ | ⚠ |
+| Status window | ✅ | ❌ | ❌ |
+| Process exclusion | ✅ | ❌ | ❌ |
+| Scheduled clean | ✅ | ⚠ | ⚠ |
+
+---
+
+## Testing
+
+UI tests use [pywinauto](https://github.com/pywinauto/pywinauto) to drive the Win32 app.
+**Must run from an elevated (Administrator) terminal.**
+
+```bat
+uv run pytest tests/ -v
+```
+
+Tests cover: launch, single-instance guard, global hotkey, settings dialog fields,
+settings cancel, status window open/ESC, clean via WM_COMMAND, and graceful exit.
 
 ---
 
