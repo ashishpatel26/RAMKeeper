@@ -8,7 +8,7 @@ import os
 import subprocess
 import time
 import pytest
-from pywinauto import Application, Desktop
+from pywinauto import Desktop
 from pywinauto.keyboard import send_keys
 
 EXE = os.path.join(os.path.dirname(__file__), "..", "build", "RAMKeeper.exe")
@@ -75,7 +75,7 @@ def test_single_instance(app):
         capture_output=True, text=True
     )
     # tasklist shows one line per process — exactly one should appear
-    lines = [l for l in procs.stdout.splitlines() if "RAMKeeper.exe" in l]
+    lines = [ln for ln in procs.stdout.splitlines() if "RAMKeeper.exe" in ln]
     assert len(lines) == 1, f"Expected 1 process, got {len(lines)}"
 
 
@@ -104,14 +104,14 @@ def test_hotkey_does_not_crash(app):
 
 def _open_settings_via_menu():
     """
-    Post WM_COMMAND for IDM_SETTINGS (103) directly — avoids brittle tray
+    Post WM_COMMAND for IDM_SETTINGS (102) directly — avoids brittle tray
     right-click simulation which requires exact icon coordinates.
     """
     # ponytail: SendMessage approach; real tray click needs coords from
     # Shell_NotifyIconGetRect (Vista+), add when testing click paths matters.
     import ctypes
     WM_COMMAND = 0x0111
-    IDM_SETTINGS = 103
+    IDM_SETTINGS = 102
 
     hwnd = ctypes.windll.user32.FindWindowW("RAMKeeper", "RAMKeeper")
     if hwnd:
@@ -196,10 +196,10 @@ def test_status_window_closes_on_escape(app):
 # ── 6. Clean via WM_COMMAND ──────────────────────────────────────────────────
 
 def test_clean_now_does_not_crash(app):
-    """IDM_CLEAN_NOW (101) fires without killing the process."""
+    """IDM_CLEAN_NOW (100) fires without killing the process."""
     import ctypes
     WM_COMMAND = 0x0111
-    IDM_CLEAN_NOW = 101
+    IDM_CLEAN_NOW = 100
     hwnd = ctypes.windll.user32.FindWindowW("RAMKeeper", "RAMKeeper")
     assert hwnd, "RAMKeeper HWND not found"
     ctypes.windll.user32.PostMessageW(hwnd, WM_COMMAND, IDM_CLEAN_NOW, 0)
@@ -214,10 +214,10 @@ def test_clean_now_does_not_crash(app):
 # ── 7. Graceful exit ─────────────────────────────────────────────────────────
 
 def test_exit_via_menu(app):
-    """IDM_EXIT (102) terminates the process cleanly."""
+    """IDM_EXIT (103) terminates the process cleanly."""
     import ctypes
     WM_COMMAND = 0x0111
-    IDM_EXIT = 102
+    IDM_EXIT = 103
     hwnd = ctypes.windll.user32.FindWindowW("RAMKeeper", "RAMKeeper")
     assert hwnd
     ctypes.windll.user32.PostMessageW(hwnd, WM_COMMAND, IDM_EXIT, 0)
