@@ -60,6 +60,7 @@ jobs:
       #   SIGNPATH_ORGANIZATION_ID — from SignPath dashboard → Settings → General
       - name: Sign EXE (SignPath.io)
         if: startsWith(github.ref, 'refs/tags/')
+        continue-on-error: true
         uses: signpath/github-action-submit-signing-request@v1
         with:
           api-token:                  '${{ secrets.SIGNPATH_API_TOKEN }}'

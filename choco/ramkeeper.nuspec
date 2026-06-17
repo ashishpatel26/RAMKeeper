@@ -2,7 +2,7 @@
 <package xmlns="http://schemas.microsoft.com/packaging/2015/06/nuspec.xsd">
   <metadata>
     <id>ramkeeper</id>
-    <version>1.0.3</version>
+    <version>1.1.0</version>
     <packageSourceUrl>https://github.com/ashishpatel26/RAMKeeper</packageSourceUrl>
     <owners>ashishpatel26</owners>
     <title>RAMKeeper</title>
@@ -13,16 +13,18 @@
     <projectSourceUrl>https://github.com/ashishpatel26/RAMKeeper</projectSourceUrl>
     <bugTrackerUrl>https://github.com/ashishpatel26/RAMKeeper/issues</bugTrackerUrl>
     <tags>ram memory cleaner optimizer tray windows admin</tags>
-    <summary>Lightweight Windows RAM cleaner â€” 142KB static binary with system tray, hotkey, and auto-clean support.</summary>
-    <description>RAMKeeper is a lightweight (142KB) portable Windows RAM cleaner that purges the standby/cached memory list via NtSetSystemInformation, immediately reclaiming memory without rebooting.
+    <summary>Lightweight Windows RAM cleaner — 163 KB static binary with system tray, hotkey, auto-clean, status window, and process exclusions.</summary>
+    <description>RAMKeeper is a lightweight (163 KB) portable Windows RAM cleaner that purges the standby/cached memory list via NtSetSystemInformation, immediately reclaiming memory without rebooting.
 
 ## Features
 
-- **System tray app** â€” runs quietly in the background
-- **Global hotkey** â€” Ctrl+Alt+R triggers an instant purge from anywhere
-- **Auto-clean modes** â€” threshold-based (purge when free RAM drops below N%), interval-based (purge every N minutes), and idle-based (purge after N minutes of inactivity)
-- **No runtime dependencies** â€” single static binary, no .NET, no MSVC redistributable
-- **No ads, no telemetry** â€” MIT licensed, open source
+- **System tray app** — runs quietly in the background
+- **Status window** — left-click tray for color-coded RAM %, sparkline, clean history
+- **Global hotkey** — Ctrl+Alt+R triggers an instant purge from anywhere
+- **Auto-clean modes** — threshold-based, interval-based, idle-based, scheduled daily clean
+- **Process exclusions** — skip specific exe names from working-set trim
+- **No runtime dependencies** — single static binary, no .NET, no MSVC redistributable
+- **No ads, no telemetry** — MIT licensed, open source
 
 ## Notes
 
@@ -30,7 +32,7 @@ RAMKeeper requires administrator privileges because the standby memory purge nee
 
 This is a portable executable. Chocolatey installs it to the tools directory and creates a shim so `RAMKeeper` is available from any terminal.
     </description>
-    <releaseNotes>https://github.com/ashishpatel26/RAMKeeper/releases/tag/v1.0.3</releaseNotes>
+    <releaseNotes>https://github.com/ashishpatel26/RAMKeeper/releases/tag/v1.1.0</releaseNotes>
     <copyright>Copyright (c) 2026 Ashish Patel</copyright>
   </metadata>
   <files>
