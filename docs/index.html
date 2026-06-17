@@ -4,7 +4,7 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>RAMKeeper — Lightweight Windows RAM Cleaner</title>
-  <meta name="description" content="149 KB RAM cleaner for Windows. Purges standby list, settings dialog, no ads, open source." />
+  <meta name="description" content="163 KB RAM cleaner for Windows. Status window, sparkline graph, purges standby list, no ads, open source." />
 
   <!-- Fonts -->
   <link rel="preconnect" href="https://fonts.googleapis.com" />
@@ -599,7 +599,7 @@
 <section class="hero">
   <div class="hero-badge">
     <span class="dot"></span>
-    v1.0.3 — Stable Release
+    v1.1.0 — Latest Release
   </div>
 
   <h1>
@@ -609,7 +609,7 @@
 
   <p>
     Windows silently fills RAM with cached standby data — even when idle.
-    RAMKeeper purges it instantly. <strong style="color:var(--text)">149 KB.</strong> No bloat. No ads. Just clean RAM.
+    RAMKeeper purges it instantly. <strong style="color:var(--text)">163 KB.</strong> No bloat. No ads. Just clean RAM.
   </p>
 
   <div class="hero-actions">
@@ -622,7 +622,7 @@
   </div>
 
   <div class="hero-stats">
-    <div class="stat-pill"><span class="ico">📦</span><span class="val">149 KB</span><span class="lbl">binary size</span></div>
+    <div class="stat-pill"><span class="ico">📦</span><span class="val">163 KB</span><span class="lbl">binary size</span></div>
     <div class="stat-pill"><span class="ico">🔒</span><span class="val">Zero</span><span class="lbl">runtime deps</span></div>
     <div class="stat-pill"><span class="ico">⚡</span><span class="val">&lt; 1s</span><span class="lbl">clean time</span></div>
     <div class="stat-pill"><span class="ico">🪟</span><span class="val">Win 7+</span><span class="lbl">compatible</span></div>
@@ -667,12 +667,22 @@
       <div class="feature-card">
         <div class="feature-icon" style="background:rgba(251,191,36,0.15);">📦</div>
         <h3>Single Portable EXE</h3>
-        <p>149 KB static binary. No installer. No Visual C++ Redistributable. No .NET. Drop it anywhere and run. Copy to a USB drive and carry it everywhere.</p>
+        <p>163 KB static binary. No installer. No Visual C++ Redistributable. No .NET. Drop it anywhere and run. Copy to a USB drive and carry it everywhere.</p>
       </div>
       <div class="feature-card">
         <div class="feature-icon" style="background:rgba(244,63,94,0.15);">🛡️</div>
         <h3>Open Source & Signed</h3>
         <p>Full C++ Win32 source on GitHub. MIT licensed. Code-signed binary to avoid Defender false positives. Audit every line yourself.</p>
+      </div>
+      <div class="feature-card">
+        <div class="feature-icon" style="background:rgba(99,102,241,0.15);">📊</div>
+        <h3>Status Window</h3>
+        <p>Click the tray icon for a dark-mode popup: color-coded RAM %, 5-minute sparkline graph, last 5 clean events, and an admin/limited-mode badge. Win11 rounded corners + dark title bar.</p>
+      </div>
+      <div class="feature-card">
+        <div class="feature-icon" style="background:rgba(34,211,164,0.15);">🚫</div>
+        <h3>Process Exclusion & Schedule</h3>
+        <p>Exclude specific exe names (games, VMs) from working-set trim. Set a daily scheduled clean at any hour:minute. All configurable in Settings.</p>
       </div>
     </div>
   </div>
@@ -721,7 +731,7 @@
 
       <div class="arch-box">
 <span class="hl">┌─────────────────────────────────────────┐</span>
-<span class="hl">│  RAMKeeper.exe  (149 KB, static)         │</span>
+<span class="hl">│  RAMKeeper.exe  (163 KB, static)         │</span>
 <span class="hl">├─────────────────────────────────────────┤</span>
 │  <span class="hl2">┌─ Tray Icon (Shell_NotifyIcon)</span>        │
 │  <span class="hl2">│   ├─ "Clean Now"</span>                     │
@@ -816,7 +826,7 @@
           <br><span class="prompt">&gt;</span> <span class="cmd">git clone https://github.com/ashishpatel26/RAMKeeper.git &amp;&amp; cd RAMKeeper</span>
           <br><span class="prompt">&gt;</span> <span class="cmd">cmake -B build -G Ninja -DCMAKE_BUILD_TYPE=Release</span>
           <br><span class="prompt">&gt;</span> <span class="cmd">cmake --build build --config Release</span>
-          <br><br><span class="out ok">✓ build\RAMKeeper.exe  —  149 KB, zero external deps</span>
+          <br><br><span class="out ok">✓ build\RAMKeeper.exe  —  163 KB, zero external deps</span>
           <br><span class="out ok">✓ dumpbin /dependents: KERNEL32 USER32 SHELL32 ADVAPI32 only</span>
         </div>
       </div>
@@ -860,6 +870,18 @@
         <div class="config-item">
           <span class="key">start_with_windows</span>
           <span class="desc">Add to registry Run key. <strong>0</strong> = no, <strong>1</strong> = yes</span>
+        </div>
+        <div class="config-item" style="border-color:rgba(99,102,241,0.3);">
+          <span class="key" style="color:#6ee7b7;">exclude_list</span>
+          <span class="desc">Comma-sep exe names to skip from WS trim (e.g. <strong>game.exe, vm.exe</strong>). New in v1.1.0</span>
+        </div>
+        <div class="config-item" style="border-color:rgba(99,102,241,0.3);">
+          <span class="key" style="color:#6ee7b7;">clean_hour / clean_minute</span>
+          <span class="desc">Daily scheduled clean. Hour 0–23 (−1 = off), minute 0–59. Default: <strong>disabled</strong>. New in v1.1.0</span>
+        </div>
+        <div class="config-item" style="border-color:rgba(99,102,241,0.3);">
+          <span class="key" style="color:#6ee7b7;">notify_min_mb</span>
+          <span class="desc">Min freed MB to show balloon notification. Default: <strong>10</strong>. New in v1.1.0</span>
         </div>
       </div>
 
@@ -923,7 +945,7 @@ start_with_windows = 0</code></pre>
         <tbody>
           <tr class="ours">
             <td>RAMKeeper ✦</td>
-            <td><strong style="color:var(--green)">149 KB</strong></td>
+            <td><strong style="color:var(--green)">163 KB</strong></td>
             <td><span class="tick">✓</span></td>
             <td><span class="tick">✓</span></td>
             <td><span class="tick">✓</span></td>
@@ -982,7 +1004,7 @@ start_with_windows = 0</code></pre>
 
     <div class="badges">
       <span class="badge badge-purple">C++ Win32</span>
-      <span class="badge badge-green">149 KB binary</span>
+      <span class="badge badge-green">163 KB binary</span>
       <span class="badge badge-pink">MIT License</span>
       <span class="badge badge-orange">Windows 7+</span>
     </div>
