@@ -13,7 +13,7 @@ static void EnsureDir() {
     SHGetFolderPathW(nullptr, CSIDL_APPDATA, nullptr, 0, appdata);
     wchar_t dir[MAX_PATH]{};
     StringCchPrintfW(dir, MAX_PATH, L"%s\\RAMKeeper", appdata);
-    CreateDirectoryW(dir, nullptr); // no-op if exists
+    CreateDirectoryW(dir, nullptr);
 }
 
 AppConfig Config_Defaults() {
@@ -25,14 +25,17 @@ AppConfig Config_Defaults() {
     c.silentMode       = false;
     c.autoClean        = true;
     c.startWithWindows = false;
+    c.excludeList[0]   = L'\0';
+    c.cleanHour        = -1;
+    c.cleanMinute      = 0;
+    c.notifyMinMB      = 10;
+    c.showStatusOnClean = false;
     return c;
 }
 
-// Helper: read int from INI with fallback
 static int ReadInt(const wchar_t* path, const wchar_t* section,
                    const wchar_t* key, int def) {
-    return static_cast<int>(
-        GetPrivateProfileIntW(section, key, def, path));
+    return static_cast<int>(GetPrivateProfileIntW(section, key, def, path));
 }
 
 bool Config_Load(AppConfig& cfg) {
@@ -41,7 +44,6 @@ bool Config_Load(AppConfig& cfg) {
     wchar_t path[MAX_PATH]{};
     GetConfigPath(path, MAX_PATH);
 
-    // If file missing, save defaults and return
     if (GetFileAttributesW(path) == INVALID_FILE_ATTRIBUTES) {
         EnsureDir();
         Config_Save(cfg);
@@ -55,6 +57,13 @@ bool Config_Load(AppConfig& cfg) {
     cfg.silentMode       = ReadInt(path, L"Clean", L"silent_mode",        0) != 0;
     cfg.autoClean        = ReadInt(path, L"Clean", L"auto_clean",         1) != 0;
     cfg.startWithWindows = ReadInt(path, L"App",   L"start_with_windows", 0) != 0;
+    cfg.cleanHour        = ReadInt(path, L"Clean", L"clean_hour",        -1);
+    cfg.cleanMinute      = ReadInt(path, L"Clean", L"clean_minute",       0);
+    cfg.notifyMinMB      = ReadInt(path, L"Clean", L"notify_min_mb",     10);
+    cfg.showStatusOnClean = ReadInt(path, L"App",  L"show_status_on_clean", 0) != 0;
+
+    GetPrivateProfileStringW(L"Clean", L"exclude_list", L"",
+        cfg.excludeList, 256, path);
     return true;
 }
 
@@ -76,7 +85,13 @@ bool Config_Save(const AppConfig& cfg) {
     WriteInt(L"Clean", L"on_boot_delay",     cfg.onBootDelaySec);
     WriteInt(L"Clean", L"silent_mode",       cfg.silentMode ? 1 : 0);
     WriteInt(L"Clean", L"auto_clean",        cfg.autoClean  ? 1 : 0);
-    WriteInt(L"App",   L"start_with_windows",cfg.startWithWindows ? 1 : 0);
+    WriteInt(L"Clean", L"clean_hour",        cfg.cleanHour);
+    WriteInt(L"Clean", L"clean_minute",      cfg.cleanMinute);
+    WriteInt(L"Clean", L"notify_min_mb",     cfg.notifyMinMB);
+    WriteInt(L"App",   L"start_with_windows",     cfg.startWithWindows ? 1 : 0);
+    WriteInt(L"App",   L"show_status_on_clean",   cfg.showStatusOnClean ? 1 : 0);
+
+    WritePrivateProfileStringW(L"Clean", L"exclude_list", cfg.excludeList, path);
     return true;
 }
 

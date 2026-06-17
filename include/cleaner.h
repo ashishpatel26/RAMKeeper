@@ -1,13 +1,9 @@
 #pragma once
 #include "common.h"
 
-// Perform full RAM clean sequence:
-//   1. EmptyWorkingSet on all accessible processes
-//   2. NtSetSystemInformation(MemoryPurgeStandbyList)
-//   3. NtSetSystemInformation(MemoryFlushModifiedList)
-//   4. SetSystemFileCacheSize(-1,-1,0)
+// Full RAM clean sequence (trimWorkingSets + NT ops + file cache).
+// excludeList: comma-separated exe names to skip from working-set trim (nullptr = trim all).
 // Returns number of processes trimmed.
-int Cleaner_Run();
+int Cleaner_Run(const wchar_t* excludeList = nullptr);
 
-// Trim only working sets (no admin required, degraded mode)
-int Cleaner_TrimWorkingSets();
+int Cleaner_TrimWorkingSets(const wchar_t* excludeList = nullptr);

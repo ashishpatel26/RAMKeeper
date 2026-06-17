@@ -28,6 +28,7 @@
 #define IDM_AUTO_TOGGLE   101
 #define IDM_SETTINGS      102
 #define IDM_EXIT          103
+#define IDM_STATUS        104
 
 // Global hotkey ID
 #define HOTKEY_CLEAN  1
